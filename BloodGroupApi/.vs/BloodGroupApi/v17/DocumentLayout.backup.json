@@ -1,0 +1,82 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "G:\\Asif\\LetsHelp\\BloodGroupApi\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{81CD57AD-26BD-43C3-AB73-3425C35D7EDC}|BloodGroupApi\\BloodGroupApi.csproj|g:\\asif\\letshelp\\bloodgroupapi\\bloodgroupapi\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{81CD57AD-26BD-43C3-AB73-3425C35D7EDC}|BloodGroupApi\\BloodGroupApi.csproj|solutionrelative:bloodgroupapi\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{81CD57AD-26BD-43C3-AB73-3425C35D7EDC}|BloodGroupApi\\BloodGroupApi.csproj|g:\\asif\\letshelp\\bloodgroupapi\\bloodgroupapi\\models\\mail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81CD57AD-26BD-43C3-AB73-3425C35D7EDC}|BloodGroupApi\\BloodGroupApi.csproj|solutionrelative:bloodgroupapi\\models\\mail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{81CD57AD-26BD-43C3-AB73-3425C35D7EDC}|BloodGroupApi\\BloodGroupApi.csproj|G:\\Asif\\LetsHelp\\BloodGroupApi\\bloodgroupapi\\controllers\\bgcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81CD57AD-26BD-43C3-AB73-3425C35D7EDC}|BloodGroupApi\\BloodGroupApi.csproj|solutionrelative:bloodgroupapi\\controllers\\bgcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Web.config",
+              "DocumentMoniker": "G:\\Asif\\LetsHelp\\BloodGroupApi\\BloodGroupApi\\Web.config",
+              "RelativeDocumentMoniker": "BloodGroupApi\\Web.config",
+              "ToolTip": "G:\\Asif\\LetsHelp\\BloodGroupApi\\BloodGroupApi\\Web.config",
+              "RelativeToolTip": "BloodGroupApi\\Web.config",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
+              "WhenOpened": "2026-04-06T11:42:10.968Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Mail.cs",
+              "DocumentMoniker": "G:\\Asif\\LetsHelp\\BloodGroupApi\\BloodGroupApi\\Models\\Mail.cs",
+              "RelativeDocumentMoniker": "BloodGroupApi\\Models\\Mail.cs",
+              "ToolTip": "G:\\Asif\\LetsHelp\\BloodGroupApi\\BloodGroupApi\\Models\\Mail.cs [Read Only]",
+              "RelativeToolTip": "BloodGroupApi\\Models\\Mail.cs [Read Only]",
+              "ViewState": "AgIAAPoDAAAAAAAAAAAYwAEEAABCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-23T06:01:42.456Z",
+              "EditorCaption": " [Read Only]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "BGController.cs",
+              "DocumentMoniker": "G:\\Asif\\LetsHelp\\BloodGroupApi\\BloodGroupApi\\Controllers\\BGController.cs",
+              "RelativeDocumentMoniker": "BloodGroupApi\\Controllers\\BGController.cs",
+              "ToolTip": "G:\\Asif\\LetsHelp\\BloodGroupApi\\BloodGroupApi\\Controllers\\BGController.cs [Read Only]",
+              "RelativeToolTip": "BloodGroupApi\\Controllers\\BGController.cs [Read Only]",
+              "ViewState": "AgIAAEcHAAAAAAAAAAAQwK8HAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-16T08:48:45.172Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

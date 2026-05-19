@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.34112.143
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BloodGroupApi", "BloodGroupApi\BloodGroupApi.csproj", "{81CD57AD-26BD-43C3-AB73-3425C35D7EDC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{81CD57AD-26BD-43C3-AB73-3425C35D7EDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81CD57AD-26BD-43C3-AB73-3425C35D7EDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81CD57AD-26BD-43C3-AB73-3425C35D7EDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81CD57AD-26BD-43C3-AB73-3425C35D7EDC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {770BA332-C7DF-45BB-B876-A36A3A084BA2}
+	EndGlobalSection
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 2
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = BloodGroupApi\\BloodGroupApi.csproj
+		SccLocalPath1 = .
+		SccProjectFilePathRelativizedFromConnection1 = BloodGroupApi\\
+	EndGlobalSection
+EndGlobal
