@@ -894,6 +894,7 @@ namespace BloodGroupApi.Models
             public Int32? CreatedBy { get; set; }
             public Int32? Requestedto { get; set; }
             public Int32? RequestAcceptStatus { get; set; }
+            public Boolean? OrgPresentation { get; set; }
             public DateTime? RequestDate { get; set; }
 
             public DateTime? CreatedDate { get; set; }
@@ -1019,6 +1020,7 @@ namespace BloodGroupApi.Models
             public string Latitude { get; set; }
             public string Longitude { get; set; }
             public int? PresentationID { get; set; }
+            public Boolean? OrgPresentation { get; set; }
         }
 
         public class Volunteer

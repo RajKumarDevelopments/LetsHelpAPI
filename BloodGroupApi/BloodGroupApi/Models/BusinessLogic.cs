@@ -3233,6 +3233,7 @@ namespace BloodGroupApi.Models
 
                         RequestAcceptStatus = A.Field<Int32?>("RequestAcceptStatus") + 0,
                         PresentationID = A.Field<Int32?>("PresentationID") + 0,
+                        OrgPresentation = A.Field<bool?>("OrgPresentation"),
 
 
                     }).ToList();
