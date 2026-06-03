@@ -3276,7 +3276,8 @@ namespace BloodGroupApi.Controllers
             try
             {
                 var Param1 = HttpContext.Current.Request.Form["Param1"];
-                var data = BL.Get_PresentationAcceptedCount(Param1);
+                var Param2 = HttpContext.Current.Request.Form["Param2"];
+                var data = BL.Get_PresentationAcceptedCount(Param1, Param2);
                 return data;
             }
             catch (Exception ex)

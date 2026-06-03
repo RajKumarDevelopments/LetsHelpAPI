@@ -323,6 +323,8 @@ namespace BloodGroupApi.Models
             public Int32? BLGId { get; set; }
             public Int32? StateId { get; set; }
             public string FullName { get; set; }
+            public string MiddleName { get; set; }
+            public string SurName { get; set; }
             public string Phonenumber { get; set; }
             public string PastDonation { get; set; }
             public string Password { get; set; }
@@ -428,6 +430,8 @@ namespace BloodGroupApi.Models
             public Int32? RegId { get; set; }
             public Int32? RoleId { get; set; }
             public string FullName { get; set; }
+            public string MiddleName { get; set; }
+            public string SurName { get; set; }
             public string Phonenumber { get; set; }
           
             public string Devicetoken { get; set; }

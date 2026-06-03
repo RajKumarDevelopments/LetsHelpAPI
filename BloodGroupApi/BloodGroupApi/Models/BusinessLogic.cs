@@ -1811,6 +1811,8 @@ namespace BloodGroupApi.Models
 
                                 Weight = A.Field<Int32?>("Weight") + 0,
                                 FullName = A.Field<string>("FullName") + "",
+                                MiddleName = A.Field<string>("MiddleName") + "",
+                                SurName = A.Field<string>("SurName") + "",
                                 Devicetoken = A.Field<string>("Devicetoken") + "",
                                 Phonenumber = A.Field<string>("Phonenumber") + "",
                                 Password = A.Field<string>("Password") + "",
@@ -5407,12 +5409,12 @@ namespace BloodGroupApi.Models
 
 
         #region Get_PresentationDetails --->Upendra
-        public dynamic Get_PresentationAcceptedCount(string Param1)
+        public dynamic Get_PresentationAcceptedCount(string Param1, string Param2)
         {
             try
             {
                 List<Counts> userdata = new List<Counts>();
-                ds = db.GetDataWithSingleParam(SPS.Get_PresentationAcceptedCount.ToString(), Param1);
+                ds = db.GetDataWithTwoParameters(SPS.Get_PresentationAcceptedCount.ToString(), Param1, Param2);
                 bool checkdb = db.CheckDatainDS(ds, 0);
                 if (checkdb == true)
                 {
