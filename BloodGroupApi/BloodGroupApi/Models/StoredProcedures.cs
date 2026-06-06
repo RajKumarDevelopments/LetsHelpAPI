@@ -118,5 +118,6 @@ namespace BloodGroupApi.Models
         NotificationStatusUpdate, //Upendra
         Get_PresentationAcceptedCount,//Upendra
         Get_Acceptedpersons,//Upendra
+        CastMaster_crud,// Upendra
     }
 }

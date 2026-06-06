@@ -5486,6 +5486,58 @@ namespace BloodGroupApi.Models
             }
         }
         #endregion
+
+
+        #region   CastMaster_crud     ---- Upendra
+        public dynamic CastMaster_crud(string xmlParam, string flag)
+        {
+            try
+            {
+                var MSG = "";
+                List<CastMaster> data = new JavaScriptSerializer().Deserialize<List<CastMaster>>(xmlParam);
+                var UserData = XMLConvert.GetXmlArrayString<CastMaster>(data);
+                ds = db.SaveDataReturn1(SPS.CastMaster_crud.ToString(), UserData, flag);
+                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    MSG = ds.Tables[0].Rows[0][0].ToString();
+                    var Checkdata = db.CheckDatainDS(ds, 0);
+                    if (Checkdata == true)
+                    {
+                        if (flag == "1" || flag == "2" || flag == "3" || flag == "5")
+                        {
+                            MSG = db.GetMessage(ds);
+                            return MSG;
+                        }
+                        else if (flag == "4")
+                        {
+                            data = ds.Tables[0].AsEnumerable().Select(
+                            A => new CastMaster()
+                            {
+
+                                CID = A.Field<Int32?>("CID") + 0,
+                                CastName = A.Field<string>("CastName") + "",
+                                Status = A.Field<Boolean?>("Status") ?? null,
+                                CreatedDate = A.Field<DateTime?>("CreatedDate") ?? null,
+                                CreatedBy = A.Field<Int32?>("CreatedBy") + 0,
+                                ModifiedDate = A.Field<DateTime?>("ModifiedDate") ?? null,
+                                ModifiedBy = A.Field<Int32?>("ModifiedBy") + 0,
+
+                            }).ToList();
+                            return data;
+                        }
+                    }
+                    // ds.Clear();
+                }
+                return MSG;
+            }
+            catch (Exception ex)
+            {
+                saveExceptions((ex.Message + ex.StackTrace).ToString(), "0", "Webapi");
+                exp.ExceptionHandler(ex);
+                throw ex;
+            }
+        }
+        #endregion
     }
 
 }

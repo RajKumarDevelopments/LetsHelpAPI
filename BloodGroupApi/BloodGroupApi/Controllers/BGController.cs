@@ -3309,6 +3309,26 @@ namespace BloodGroupApi.Controllers
         }
 
         #endregion
+
+        #region   CastMaster_crud     ------  Upendra
+        [HttpPost]
+        public dynamic CastMaster_crud()
+        {
+            try
+            {
+                var Param = System.Web.HttpContext.Current.Request.Form["Param"];
+                var Flag = System.Web.HttpContext.Current.Request.Form["Flag"];
+                var MSG = BL.CastMaster_crud(Param, Flag);
+                return MSG;
+            }
+            catch (System.Exception ex)
+            {
+                exp.ExceptionHandler(ex);
+                BL.saveExceptions((ex.Message + ex.StackTrace).ToString(), "1", "Webapi");
+                throw ex;
+            }
+        }
+        #endregion
     }
 }
    

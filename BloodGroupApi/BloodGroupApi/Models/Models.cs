@@ -1462,5 +1462,17 @@ namespace BloodGroupApi.Models
 
         }
 
+        public class CastMaster
+        {
+            public int? CID { get; set; }
+            public string CastName {  get; set; }
+            public Boolean? Status { get; set; }
+            public DateTime? CreatedDate { get; set; }
+            public int? CreatedBy { get; set; }
+            public DateTime? ModifiedDate { get; set; }
+            public int? ModifiedBy { get; set; }
+
+        }
+
     }
 }
