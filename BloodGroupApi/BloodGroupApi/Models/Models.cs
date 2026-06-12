@@ -471,7 +471,7 @@ namespace BloodGroupApi.Models
             public string UserAddress { get; set; }
             public string Area { get; set; }
             public string DoctorName { get; set; }
-            public string Purpose { get; set; }
+            public Int32? Purpose { get; set; }
             public string HospitalName { get; set; }
             public string HospitalAddress { get; set; }
             public string PastDonation { get; set; }
@@ -498,6 +498,7 @@ namespace BloodGroupApi.Models
             public string State { get; set; }
             public Int32 NotificationStatus { get; set; }
             public string CreatedByEmail { get; set; }
+            public string Reason { get; set; }
             public Int32 WhatappStatus { get; set; }
             public Int32 EmailStatus { get; set; }
            
@@ -754,7 +755,7 @@ namespace BloodGroupApi.Models
 
             public string RequestTime { get; set; }
             public string Age { get; set; }
-            public string Purpose { get; set; }
+            public Int32? Purpose { get; set; }
             public string ContactPerson { get; set; }
             public string ContactMobile { get; set; }
             public string Messagetorequester { get; set; }
@@ -768,6 +769,7 @@ namespace BloodGroupApi.Models
             public string newStatename { get; set; }
             public string newDistrictname { get; set; }
             public string newCityname { get; set; }
+            public string Reason { get; set; }
             public Int32? CreatedBy { get; set; }
             public Int32? BloodGroupId { get; set; }
             public Int32? UnitsofBloodId { get; set; }
@@ -1466,6 +1468,17 @@ namespace BloodGroupApi.Models
         {
             public int? CID { get; set; }
             public string CastName {  get; set; }
+            public Boolean? Status { get; set; }
+            public DateTime? CreatedDate { get; set; }
+            public int? CreatedBy { get; set; }
+            public DateTime? ModifiedDate { get; set; }
+            public int? ModifiedBy { get; set; }
+
+        }
+        public class ReasonMaster
+        {
+            public int? RID { get; set; }
+            public string Reason {  get; set; }
             public Boolean? Status { get; set; }
             public DateTime? CreatedDate { get; set; }
             public int? CreatedBy { get; set; }

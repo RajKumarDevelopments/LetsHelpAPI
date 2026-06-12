@@ -3329,6 +3329,27 @@ namespace BloodGroupApi.Controllers
             }
         }
         #endregion
+
+
+        #region ReasonMaster_crud     ------  Upendra
+        [HttpPost]
+        public dynamic ReasonMaster_crud()
+        {
+            try
+            {
+                var Param = System.Web.HttpContext.Current.Request.Form["Param"];
+                var Flag = System.Web.HttpContext.Current.Request.Form["Flag"];
+                var MSG = BL.ReasonMaster_crud(Param, Flag);
+                return MSG;
+            }
+            catch (System.Exception ex)
+            {
+                exp.ExceptionHandler(ex);
+                BL.saveExceptions((ex.Message + ex.StackTrace).ToString(), "1", "Webapi");
+                throw ex;
+            }
+        }
+        #endregion
     }
 }
    

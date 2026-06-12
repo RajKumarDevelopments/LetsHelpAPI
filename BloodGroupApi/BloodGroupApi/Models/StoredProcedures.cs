@@ -119,5 +119,6 @@ namespace BloodGroupApi.Models
         Get_PresentationAcceptedCount,//Upendra
         Get_Acceptedpersons,//Upendra
         CastMaster_crud,// Upendra
+        BloodReasonMaster_crud,//Upendra
     }
 }

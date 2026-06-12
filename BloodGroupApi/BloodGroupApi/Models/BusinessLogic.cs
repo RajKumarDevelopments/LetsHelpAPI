@@ -2187,7 +2187,7 @@ namespace BloodGroupApi.Models
                         Age = c.Field<string>("Age") + "",
                         BloodRequestDate = c.Field<string>("BloodRequestDate") + "",
                         RequestTime = c.Field<string>("RequestTime") + "",
-                        Purpose = c.Field<string>("Purpose") + "",
+                        Purpose = c.Field<Int32?>("Purpose") + 0,
                         UnitsofBlood = c.Field<string>("UnitsofBlood") + "",
                         Typesofblood = c.Field<string>("Typesofblood") + "",
                         ContactPerson = c.Field<string>("ContactPerson") + "",
@@ -2198,6 +2198,7 @@ namespace BloodGroupApi.Models
                         newStatename = c.Field<string>("newStatename") + "",
                         newDistrictname = c.Field<string>("newDistrictname") + "",
                         newCityname = c.Field<string>("newCityname") + "",
+                        Reason = c.Field<string>("Reason") + "",
                         CreatedBy = c.Field<Int32?>("CreatedBy") + 0,
                         BloodGroupId = c.Field<Int32?>("BloodGroupId") + 0,
                         UnitsofBloodId = c.Field<Int32?>("UnitsofBloodId") + 0,
@@ -2258,7 +2259,7 @@ namespace BloodGroupApi.Models
                         Age = c.Field<string>("Age") + "",
                         BloodRequestDate = c.Field<string>("BloodRequestDate") + "",
                         RequestTime = c.Field<string>("RequestTime") + "",
-                        Purpose = c.Field<string>("Purpose") + "",
+                        Purpose = c.Field<Int32?>("Purpose") + 0,
                         ContactPerson = c.Field<string>("ContactPerson") + "",
                         ContactMobile = c.Field<string>("ContactMobile") + "",
                         HospitalPhonenumber = c.Field<string>("HospitalPhonenumber") + "",
@@ -2494,7 +2495,7 @@ namespace BloodGroupApi.Models
                         BloodRequestDate = c.Field<string>("BloodRequestDate") + "",
                         Dateofservice = c.Field<DateTime?>("Dateofservice") ?? null,
                         RequestTime = c.Field<string>("RequestTime") + "",
-                        Purpose = c.Field<string>("Purpose") + "",
+                        Purpose = c.Field<Int32?>("Purpose") + 0,
                         ContactPerson = c.Field<string>("ContactPerson") + "",
                         ContactMobile = c.Field<string>("ContactMobile") + "",
                         HospitalPhonenumber = c.Field<string>("HospitalPhonenumber") + "",
@@ -3580,7 +3581,7 @@ namespace BloodGroupApi.Models
                             Age = c.Field<string>("Age") + "",
                             BloodRequestDate = c.Field<string>("BloodRequestDate") + "",
                             RequestTime = c.Field<string>("RequestTime") + "",
-                            Purpose = c.Field<string>("Purpose") + "",
+                            Purpose = c.Field<Int32?>("Purpose") + 0,
                             ContactPerson = c.Field<string>("ContactPerson") + "",
                             ContactMobile = c.Field<string>("ContactMobile") + "",
                             HospitalPhonenumber = c.Field<string>("HospitalPhonenumber") + "",
@@ -3608,7 +3609,7 @@ namespace BloodGroupApi.Models
                             Age = c.Field<string>("Age") + "",
                             BloodRequestDate = c.Field<string>("BloodRequestDate") + "",
                             RequestTime = c.Field<string>("RequestTime") + "",
-                            Purpose = c.Field<string>("Purpose") + "",
+                            Purpose = c.Field<Int32?>("Purpose") + 0,
                             ContactPerson = c.Field<string>("ContactPerson") + "",
                             ContactMobile = c.Field<string>("ContactMobile") + "",
                             HospitalPhonenumber = c.Field<string>("HospitalPhonenumber") + "",
@@ -4318,10 +4319,11 @@ namespace BloodGroupApi.Models
                             Phonenumber = A.Field<string>("Phonenumber") + "",
                             DistrictName = A.Field<string>("DistrictName") + "",
                             Age = A.Field<string>("Age") + "",
-                            Purpose = A.Field<string>("Purpose") + "",
+                            Purpose = A.Field<Int32?>("Purpose") ?? 0,
                             ContactPerson = A.Field<string>("ContactPerson") + "",
                             ContactMobile = A.Field<string>("ContactMobile") + "",
                             HospitalPhonenumber = A.Field<string>("HospitalPhonenumber") + "",
+                            Reason = A.Field<string>("Reason") + "",
 
                         }).ToList();
                         return request;
@@ -5179,7 +5181,7 @@ namespace BloodGroupApi.Models
                         SYSSubmitted = c.Field<Int32?>("SYSSubmitted") + 0, 
                         BloodRequestDate = c.Field<string>("BloodRequestDate") + "",
                         RequestTime = c.Field<string>("RequestTime") + "",
-                        Purpose = c.Field<string>("Purpose") + "",
+                        Purpose = c.Field<Int32?>("Purpose") + 0,
                         UnitsofBlood = c.Field<string>("UnitsofBlood") + "",
                         Typesofblood = c.Field<string>("Typesofblood") + "",
                      
@@ -5538,6 +5540,58 @@ namespace BloodGroupApi.Models
             }
         }
         #endregion
+
+        #region   CastMaster_crud     ---- Upendra
+        public dynamic ReasonMaster_crud(string xmlParam, string flag)
+        {
+            try
+            {
+                var MSG = "";
+                List<ReasonMaster> data = new JavaScriptSerializer().Deserialize<List<ReasonMaster>>(xmlParam);
+                var UserData = XMLConvert.GetXmlArrayString<ReasonMaster>(data);
+                ds = db.SaveDataReturn1(SPS.BloodReasonMaster_crud.ToString(), UserData, flag);
+                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    MSG = ds.Tables[0].Rows[0][0].ToString();
+                    var Checkdata = db.CheckDatainDS(ds, 0);
+                    if (Checkdata == true)
+                    {
+                        if (flag == "1" || flag == "2" || flag == "3" || flag == "5")
+                        {
+                            MSG = db.GetMessage(ds);
+                            return MSG;
+                        }
+                        else if (flag == "4")
+                        {
+                            data = ds.Tables[0].AsEnumerable().Select(
+                            A => new ReasonMaster()
+                            {
+
+                                RID = A.Field<Int32?>("RID") + 0,
+                                Reason = A.Field<string>("Reason") + "",
+                                Status = A.Field<Boolean?>("Status") ?? null,
+                                CreatedDate = A.Field<DateTime?>("CreatedDate") ?? null,
+                                CreatedBy = A.Field<Int32?>("CreatedBy") + 0,
+                                ModifiedDate = A.Field<DateTime?>("ModifiedDate") ?? null,
+                                ModifiedBy = A.Field<Int32?>("ModifiedBy") + 0,
+
+                            }).ToList();
+                            return data;
+                        }
+                    }
+                    // ds.Clear();
+                }
+                return MSG;
+            }
+            catch (Exception ex)
+            {
+                saveExceptions((ex.Message + ex.StackTrace).ToString(), "0", "Webapi");
+                exp.ExceptionHandler(ex);
+                throw ex;
+            }
+        }
+        #endregion
+
     }
 
 }
