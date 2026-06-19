@@ -1890,7 +1890,7 @@ namespace BloodGroupApi.Models
                         BLGName = A.Field<string>("BLGName") + "",
                         Gender = A.Field<string>("Gender") + "",
                         Typesofblood = A.Field<string>("Typesofblood") + "",
-                        Purpose = A.Field<string>("Purpose") + "",
+                        Purpose = A.Field<Int32?>("Purpose") + 0,
                         CityName = A.Field<string>("CityName") + "",
                         StateName = A.Field<string>("StateName") + "",
                         DistrictName = A.Field<string>("DistrictName") + "",
@@ -1905,6 +1905,7 @@ namespace BloodGroupApi.Models
                         Longitude = A.Field<string>("Longitude") + "",
                         BloodRequestDate = A.Field<string>("BloodRequestDate") + "",
                         CreatedByEmail = A.Field<string>("CreatedByEmail") + "",
+                        Reason = A.Field<string>("Reason") + "",
 
                         //RP
                         //CallStatus = A.Field<Boolean?>("CallStatus") ?? null,
@@ -3705,14 +3706,13 @@ namespace BloodGroupApi.Models
                         dash = ds.Tables[0].AsEnumerable().Select(A => new Dashboardmobile()
 
                         {
-                            Donorcount = A.Field<Int32?>("Donorcount") + 0,
-                            Referalcount = A.Field<Int32?>("Referalcount") + 0,
-                            Adddonorscount = A.Field<Int32?>("Adddonorscount") + 0,
-                            Leaderreferalcount = A.Field<Int32?>("Leaderreferalcount") + 0,
-                            Dotationcount = A.Field<Int32?>("Dotationcount") + 0,
-                            Bannercount = A.Field<Int32?>("Bannercount") + 0,
                             Presentationcount = A.Field<Int32?>("Presentationcount") + 0,
-                            Acceptedcount = A.Field<Int32?>("Acceptedcount") + 0,
+                            LeadPresentationcount = A.Field<Int32?>("LeadPresentationcount") + 0,
+                            Bannercount = A.Field<Int32?>("Bannercount") + 0,
+                            Adddonorscount = A.Field<Int32?>("Adddonorscount") + 0,
+                            Referalcount = A.Field<Int32?>("Referalcount") + 0,
+                            Dotationcount = A.Field<Int32?>("Dotationcount") + 0,
+                       
 
                         }).ToList();
                         return dash;

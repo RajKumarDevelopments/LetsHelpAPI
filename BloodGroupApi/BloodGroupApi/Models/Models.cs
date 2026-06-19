@@ -499,6 +499,7 @@ namespace BloodGroupApi.Models
             public Int32 NotificationStatus { get; set; }
             public string CreatedByEmail { get; set; }
             public string Reason { get; set; }
+            public string DonorAddByLeader { get; set; }
             public Int32 WhatappStatus { get; set; }
             public Int32 EmailStatus { get; set; }
            
@@ -702,7 +703,7 @@ namespace BloodGroupApi.Models
             public string BLGName { get; set; }
             public string Gender { get; set; }
             public string Typesofblood { get; set; }
-            public string Purpose { get; set; }
+            public Int32? Purpose { get; set; }
             public string StateName { get; set; }
             public string DistrictName { get; set; }
             public string CityName { get; set; }
@@ -718,6 +719,7 @@ namespace BloodGroupApi.Models
             public string Latitude { get; set; }
             public string Longitude { get; set; }
             public string CreatedByEmail { get; set; }
+            public string Reason { get; set; }
 
        
 
@@ -1137,14 +1139,12 @@ namespace BloodGroupApi.Models
 
         public class Dashboardmobile
         {
-            public Int32? Donorcount { get; set; }
             public Int32? Referalcount { get; set; }
             public Int32? Adddonorscount { get; set; }
-            public Int32? Leaderreferalcount { get; set; }
             public Int32? Dotationcount { get; set; }
             public Int32? Bannercount { get; set; }
             public Int32? Presentationcount { get; set; }
-            public Int32? Acceptedcount { get; set; }
+            public Int32? LeadPresentationcount { get; set; }
 
 
         }
