@@ -715,6 +715,7 @@ namespace BloodGroupApi.Models
             public string newDistrictname { get; set; }
             public string newCityname { get; set; }
             public string BloodRequestDate { get; set; }
+            public string RequestTime { get; set; }
             public string Pincode { get; set; }
             public string Latitude { get; set; }
             public string Longitude { get; set; }
@@ -1487,5 +1488,24 @@ namespace BloodGroupApi.Models
 
         }
 
+
+        public class acceptedusers
+        {
+            public int? BAID { get; set; }
+            public int? UnitsofBlood { get; set; }
+            public int? AcceptBy { get; set; }
+            public string BloodRequestID { get; set; }
+            public string FullName { get; set; }
+            public string Phonenumber { get; set; }
+            public string newStatename { get; set; }
+            public string newDistrictname { get; set; }
+            public string newCityname { get; set; }
+            public string Area { get; set; }
+            public string Pincode { get; set; }
+            public int? Count { get; set; }
+            public DateTime? CreatedDate { get; set; }
+
+
+        }
     }
 }

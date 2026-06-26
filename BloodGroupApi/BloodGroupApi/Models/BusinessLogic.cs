@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -1904,6 +1904,7 @@ namespace BloodGroupApi.Models
                         Latitude = A.Field<string>("Latitude") + "",
                         Longitude = A.Field<string>("Longitude") + "",
                         BloodRequestDate = A.Field<string>("BloodRequestDate") + "",
+                        RequestTime = A.Table.Columns.Contains("RequestTime") ? A.Field<string>("RequestTime") + "" : "",
                         CreatedByEmail = A.Field<string>("CreatedByEmail") + "",
                         Reason = A.Field<string>("Reason") + "",
 
@@ -4579,14 +4580,14 @@ namespace BloodGroupApi.Models
 
 
 
-        #region Update_request_donors -- suraj
-        public dynamic Update_request_donors(string Param1, string Param2)
+        #region Update_request_donors -- Upendra
+        public dynamic Update_request_donors(string Param1, string Param2, string Param3)
         {
             try
             {
                 var MSG = "";
                 List<RequestForm> userdata = new List<RequestForm>();
-                ds = db.GetDataWithTwoParameters(SPS.Approve_Requests_byDonors.ToString(), Param1, Param2);
+                ds = db.GetDataWithThreeParam(SPS.Approve_Requests_byDonors.ToString(), Param1, Param2, Param3);
                 MSG = ds.Tables[0].Rows[0][0].ToString();
                 var checkdb = db.CheckDatainDS(ds, 0);
                 if (checkdb == true)
@@ -5586,6 +5587,55 @@ namespace BloodGroupApi.Models
             catch (Exception ex)
             {
                 saveExceptions((ex.Message + ex.StackTrace).ToString(), "0", "Webapi");
+                exp.ExceptionHandler(ex);
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region BloodAcceptedUser   -- Upendra
+        public dynamic BloodAcceptedUser(string Param1, String Param2)
+        {
+            try
+            {
+                var MSG = "";
+                List<acceptedusers> userdata = new List<acceptedusers>();
+                ds = db.GetDataWithTwoParameters(SPS.BloodAcceptedpersons.ToString(), Param1, Param2);
+                bool checkdb = db.CheckDatainDS(ds, 0);
+                if (checkdb == true)
+                {
+                    if (Param2 == "2")
+                    {
+                        userdata = ds.Tables[0].AsEnumerable().Select(c => new acceptedusers()
+                        {
+                            Count = c.Field<Int32?>("Count") ?? 0,                    
+                        }).ToList();
+                        return userdata;
+                    }
+                    else {
+                        userdata = ds.Tables[0].AsEnumerable().Select(c => new acceptedusers()
+                        {
+                            BloodRequestID = c.Field<string>("BloodRequestID") + "",
+                            BAID = c.Field<Int32?>("BAID") ?? 0,
+                            UnitsofBlood = c.Field<Int32?>("UnitsofBlood") ?? 0,
+                            AcceptBy = c.Field<Int32?>("AcceptBy") ?? 0,
+                            FullName = c.Field<string>("FullName") + "",
+                            Phonenumber = c.Field<string>("Phonenumber") + "",
+                            newStatename = c.Field<string>("newStatename") + "",
+                            newDistrictname = c.Field<string>("newDistrictname") + "",
+                            newCityname = c.Field<string>("newCityname") + "",
+                            Area = c.Field<string>("Area") + "",
+                            Pincode = c.Field<string>("Pincode") + "",
+                            CreatedDate = c.Field<DateTime?>("CreatedDate") ?? null,
+
+                        }).ToList();
+                        return userdata;
+                    }
+                }
+                return MSG;
+            }
+            catch (Exception ex)
+            {
                 exp.ExceptionHandler(ex);
                 throw ex;
             }

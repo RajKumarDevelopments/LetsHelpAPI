@@ -2586,7 +2586,8 @@ namespace BloodGroupApi.Controllers
             {
                 var Param1 = System.Web.HttpContext.Current.Request["Param1"];
                 var Param2 = System.Web.HttpContext.Current.Request["Param2"];
-                var data = BL.Update_request_donors(Param1, Param2);
+                var Param3 = System.Web.HttpContext.Current.Request["Param3"];
+                var data = BL.Update_request_donors(Param1, Param2, Param3);
                 return data;
             }
             catch (Exception ex)
@@ -3340,6 +3341,26 @@ namespace BloodGroupApi.Controllers
                 var Param = System.Web.HttpContext.Current.Request.Form["Param"];
                 var Flag = System.Web.HttpContext.Current.Request.Form["Flag"];
                 var MSG = BL.ReasonMaster_crud(Param, Flag);
+                return MSG;
+            }
+            catch (System.Exception ex)
+            {
+                exp.ExceptionHandler(ex);
+                BL.saveExceptions((ex.Message + ex.StackTrace).ToString(), "1", "Webapi");
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region BloodAcceptedUser ------  Upendra
+        [HttpPost]
+        public dynamic BloodAcceptedUser()
+        {
+            try
+            {
+                var Param1 = System.Web.HttpContext.Current.Request.Form["Param1"];
+                var Param2 = System.Web.HttpContext.Current.Request.Form["Param2"];
+                var MSG = BL.BloodAcceptedUser(Param1, Param2);
                 return MSG;
             }
             catch (System.Exception ex)
