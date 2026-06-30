@@ -1383,14 +1383,14 @@ namespace BloodGroupApi.Controllers
         #endregion
 
 
-        #region Get_BloodRequestsIDMobiles --suraj(18-10-24)
-        [HttpGet]
+        #region Get_BloodRequestsIDMobiles --Upendra
+        [HttpPost]
         public dynamic Get_BloodRequestsIDMobiles()
         {
             try
             {
-                //var Param1 = System.Web.HttpContext.Current.Request.Form["Param1"];
-                var data = BL.BG_GetBloodRequestsIDs();
+                var Param1 = System.Web.HttpContext.Current.Request.Form["Param1"];
+                var data = BL.BG_GetBloodRequestsIDs(Param1);
                 return data;
             }
             catch (System.Exception ex)

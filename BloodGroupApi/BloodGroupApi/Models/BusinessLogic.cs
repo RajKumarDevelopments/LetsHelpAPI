@@ -2422,32 +2422,30 @@ namespace BloodGroupApi.Models
 
         #endregion
 
-        #region  BG_GetBloodRequestsIDs --suraj
-        public dynamic BG_GetBloodRequestsIDs()
+        #region  BG_GetBloodRequestsIDs --Upendra
+        public dynamic BG_GetBloodRequestsIDs(string Param1)
         {
             try
             {
                 var MSG = "";
                 List<RequestForm> userdata = new List<RequestForm>();
-                ds = db.GetData(SPS.Get_Approve_Requests_byDonors_mobile.ToString());
+                ds = db.GetDataWithSingleParam(SPS.Get_Approve_Requests_byDonors_mobile.ToString(), Param1);
                 bool checkdb = db.CheckDatainDS(ds, 0);
                 if (checkdb == true)
                 {
                     userdata = ds.Tables[0].AsEnumerable().Select(A => new RequestForm()
                     {
                         FullName = A.Field<string>("FullName") + "",
-
                         BloodRequestID = A.Field<string>("BloodRequestID") + "",
                         ApprovalStatus = A.Field<Int32?>("ApprovalStatus") + 0,
                         CreatedBy = A.Field<Int32?>("CreatedBy") + 0,
                         ModifiedBy = A.Field<Int32?>("ModifiedBy") + 0,
                         AcceptedBy = A.Field<Int32?>("AcceptedBy") + 0,
                         SYSSubmitted = A.Field<Int32?>("SYSSubmitted") + 0,
-
-
                     }).ToList();
+                    return userdata;
                 }
-                return userdata;
+                return MSG;
 
             }
             catch (Exception ex)
