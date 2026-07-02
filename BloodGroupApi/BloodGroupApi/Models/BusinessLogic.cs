@@ -872,7 +872,7 @@ namespace BloodGroupApi.Models
                                 Area = A.Field<string>("Area") + "",
                                 HospitalName = A.Field<string>("HospitalName") + "",
                                 DoctorName = A.Field<string>("DoctorName") + "",
-                                Purpose = A.Field<string>("Purpose") + "",
+                                Purpose = A.Field<Int32?>("Purpose") + 0,
                                 Pincode = A.Field<string>("Pincode") + "",
                                 ContactPerson = A.Field<string>("ContactPerson") + "",
                                 ContactMobile = A.Field<string>("ContactMobile") + "",

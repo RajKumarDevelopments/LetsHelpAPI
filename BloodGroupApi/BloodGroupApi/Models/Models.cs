@@ -404,7 +404,7 @@ namespace BloodGroupApi.Models
             public string HospitalAddress { get; set; }
             public string HospitalName { get; set; }
             public string DoctorName { get; set; }
-            public string Purpose { get; set; }
+            public Int32? Purpose { get; set; }
             public string Area { get; set; }
             public string Pincode { get; set; }
             public string ContactPerson { get; set; }
