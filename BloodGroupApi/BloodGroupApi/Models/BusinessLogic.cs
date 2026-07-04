@@ -1,20 +1,21 @@
+using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Security.Cryptography;
 using System.Text;
-using System.Web.Script.Serialization;
 using System.Text.Json;
+using System.Web.Http;
+using System.Web.Script.Serialization;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
-using System.Web.Http;
-using System.Web.UI;
-using System.Linq;
-using Newtonsoft.Json;
-using System.Data.SqlClient;
-using System.Security.Cryptography;
 using static BloodGroupApi.Models.Models;
 
 namespace BloodGroupApi.Models
@@ -2436,6 +2437,7 @@ namespace BloodGroupApi.Models
                     userdata = ds.Tables[0].AsEnumerable().Select(A => new RequestForm()
                     {
                         FullName = A.Field<string>("FullName") + "",
+                        ContactPerson = A.Field<string>("ContactPerson") + "",
                         BloodRequestID = A.Field<string>("BloodRequestID") + "",
                         ApprovalStatus = A.Field<Int32?>("ApprovalStatus") + 0,
                         CreatedBy = A.Field<Int32?>("CreatedBy") + 0,
@@ -5125,7 +5127,7 @@ namespace BloodGroupApi.Models
         {
             try
             {
-                List<RequestForm> services = new List<RequestForm>();
+                List<register> services = new List<register>();
 
                 ds = db.GetDataWithSingleParam(SPS.GetLocation_Donationdate_basedonBrequestID.ToString(), Param1);
 
@@ -5133,12 +5135,12 @@ namespace BloodGroupApi.Models
 
                  
                 // Map dataset rows into model
-                services = ds.Tables[0].AsEnumerable().Select(c => new RequestForm()
+                services = ds.Tables[0].AsEnumerable().Select(c => new register()
                 {
                     RegId = c.Field<Int32?>("RegId") ?? 0,
                     FullName = c.Field<string>("FullName") + "",
                     BloodRequestID = c.Field<string>("BloodRequestID") + "",
-                    BloodRequestDate = c.Field<string>("BloodRequestDate") + "",
+                    BloodRequestDate = c.Field<DateTime?>("BloodRequestDate") ?? null,
                     HospitalAddress = c.Field<string>("HospitalAddress") + "",
                 }).ToList();
 

@@ -1507,5 +1507,14 @@ namespace BloodGroupApi.Models
 
 
         }
+
+        public class register
+        {
+            public int? RegId { get; set; }
+            public string FullName { get; set; }
+            public string BloodRequestID { get; set; }
+            public string HospitalAddress { get; set; }
+            public DateTime? BloodRequestDate { get; set; }
+        }
     }
 }
