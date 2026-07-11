@@ -1161,12 +1161,8 @@ namespace BloodGroupApi.Controllers
             {
                 var Param1 = System.Web.HttpContext.Current.Request.Form["Param1"];
                 var Param2 = System.Web.HttpContext.Current.Request.Form["Param2"];
-                var Param3 = System.Web.HttpContext.Current.Request.Form["Param3"];
-                var Param4 = System.Web.HttpContext.Current.Request.Form["Param4"];
-                var Param5 = System.Web.HttpContext.Current.Request.Form["Param5"];
-                var Param6 = System.Web.HttpContext.Current.Request.Form["Param6"];
 
-                var MSG = BL.Get_Searchdetails(Param1, Param2, Param3, Param4, Param5, Param6);
+                var MSG = BL.Get_Searchdetails(Param1, Param2);
                 return MSG;
             }
             catch (System.Exception ex)
@@ -3360,7 +3356,8 @@ namespace BloodGroupApi.Controllers
             {
                 var Param1 = System.Web.HttpContext.Current.Request.Form["Param1"];
                 var Param2 = System.Web.HttpContext.Current.Request.Form["Param2"];
-                var MSG = BL.BloodAcceptedUser(Param1, Param2);
+                var Param3 = System.Web.HttpContext.Current.Request.Form["Param3"];
+                var MSG = BL.BloodAcceptedUser(Param1, Param2, Param3);
                 return MSG;
             }
             catch (System.Exception ex)

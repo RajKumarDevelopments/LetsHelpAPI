@@ -1929,12 +1929,12 @@ namespace BloodGroupApi.Models
         #endregion
 
         #region Get Search user details-->Commented By SRINIVAS
-        public dynamic Get_Searchdetails(string param1, string param2, string param3, string param4, string param5, string param6)
+        public dynamic Get_Searchdetails(string Param1, string Param2)
         {
             try
             {
                 List<search> allExceptions = new List<search>();
-                ds = db.GetDataWithFiveParam(SPS.User_SearchDeatils.ToString(), param1, param2, param3, param4, param5, param6);
+                ds = db.GetDataWithTwoParameters(SPS.User_SearchDeatils.ToString(), Param1, Param2);
                 bool checkdata = db.CheckDatainDS(ds, 0);
                 if (checkdata == true)
                 {
@@ -1951,7 +1951,6 @@ namespace BloodGroupApi.Models
                         StateName = c.Field<string>("StateName") + "",
                         Area = c.Field<string>("Area") + "",
                         Pincode = c.Field<string>("Pincode") + "",
-                        CountryName = c.Field<string>("CountryName") + "",
                         DoctorName = c.Field<string>("DoctorName") + "",
                         Gender = c.Field<string>("Gender") + "",
                         HospitalAddress = c.Field<string>("HospitalAddress") + "",
@@ -5594,13 +5593,13 @@ namespace BloodGroupApi.Models
         #endregion
 
         #region BloodAcceptedUser   -- Upendra
-        public dynamic BloodAcceptedUser(string Param1, String Param2)
+        public dynamic BloodAcceptedUser(string Param1, String Param2, string Param3)
         {
             try
             {
                 var MSG = "";
                 List<acceptedusers> userdata = new List<acceptedusers>();
-                ds = db.GetDataWithTwoParameters(SPS.BloodAcceptedpersons.ToString(), Param1, Param2);
+                ds = db.GetDataWithThreeParam(SPS.BloodAcceptedpersons.ToString(), Param1, Param2, Param3);
                 bool checkdb = db.CheckDatainDS(ds, 0);
                 if (checkdb == true)
                 {
@@ -5609,6 +5608,15 @@ namespace BloodGroupApi.Models
                         userdata = ds.Tables[0].AsEnumerable().Select(c => new acceptedusers()
                         {
                             Count = c.Field<Int32?>("Count") ?? 0,                    
+                        }).ToList();
+                        return userdata;
+                    }
+                    else if (Param2 == "3")
+                    {
+                        userdata = ds.Tables[0].AsEnumerable().Select(c => new acceptedusers()
+                        {
+                            BloodRequestID = c.Field<string>("BloodRequestID") + "",
+                            AcceptBy = c.Field<Int32?>("AcceptBy") ?? 0,
                         }).ToList();
                         return userdata;
                     }
