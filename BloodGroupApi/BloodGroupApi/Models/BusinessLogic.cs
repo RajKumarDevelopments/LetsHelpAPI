@@ -4002,6 +4002,11 @@ namespace BloodGroupApi.Models
                 // Create the FCM HTTP v1 API endpoint URL
                 string url = $"https://fcm.googleapis.com/v1/projects/{projectId}/messages:send";
 
+                if (string.IsNullOrEmpty(img))
+                {
+                    img = null;
+                }
+
                 // Build the notification payload
                 var message = new
                 {
@@ -4024,7 +4029,7 @@ namespace BloodGroupApi.Models
                 };
 
                 // Serialize the payload to JSON
-                var jsonMessage = JsonConvert.SerializeObject(message);
+                var jsonMessage = JsonConvert.SerializeObject(message, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 var byteArray = Encoding.UTF8.GetBytes(jsonMessage);
 
                 // Create an HTTP POST request
@@ -4062,12 +4067,24 @@ namespace BloodGroupApi.Models
                     }
                 }
             }
+            catch (System.Net.WebException ex)
+            {
+                if (ex.Response != null)
+                {
+                    using (var stream = ex.Response.GetResponseStream())
+                    using (var reader = new System.IO.StreamReader(stream))
+                    {
+                        string errorResponse = reader.ReadToEnd();
+                        return errorResponse; // This will return the detailed FCM JSON error
+                    }
+                }
+                return ex.Message;
+            }
             catch (Exception ex)
-
             {
                 // Handle exceptions
                 saveExceptions((ex.Message + ex.StackTrace).ToString(), "0", "Webapi");
-                return "ERROR";
+                return "ERROR: " + ex.Message;
             }
         }
 
@@ -4518,37 +4535,43 @@ namespace BloodGroupApi.Models
         {
             try
             {
-                var MSG = "";
                 List<Bloodreqcondition> userdata = new List<Bloodreqcondition>();
-                ds = db.GetDataWithTwoParameters(SPS.GetUsers_basedonPincode_BloodreqCondition.ToString(), code, bloodid);
-                MSG = ds.Tables[0].Rows[0][0].ToString();
+
+                ds = db.GetDataWithTwoParameters(
+                    SPS.GetUsers_basedonPincode_BloodreqCondition.ToString(),
+                    code,
+                    bloodid);
+
                 var checkdb = db.CheckDatainDS(ds, 0);
-                if (checkdb == true)
+
+                if (checkdb)
                 {
                     userdata = ds.Tables[0].AsEnumerable().Select(A => new Bloodreqcondition
                     {
-                       
                         RegId = A.Field<int?>("RegId"),
                         RoleId = A.Field<int?>("RoleId"),
                         Devicetoken = A.Field<string>("Devicetoken") ?? "",
                         FullName = A.Field<string>("FullName") ?? "",
                         BloodGroupName = A.Field<string>("BLGName") ?? "",
                         Pincode = A.Field<string>("Pincode") ?? "",
-                        Lastdonatedate = A.Field<DateTime?>("Lastdonatedate")?? null,
+                        Lastdonatedate = A.Field<DateTime?>("Lastdonatedate"),
                         Phonenumber = A.Field<string>("Phonenumber") ?? ""
                     }).ToList();
+
                     return userdata;
                 }
-                return MSG;
+                else
+                {
+                    return "SUCCESS";
+                }
             }
             catch (Exception ex)
             {
                 exp.ExceptionHandler(ex);
                 saveExceptions((ex.Message + ex.StackTrace).ToString(), "1", "webapi");
-                throw ex;
+                throw;
             }
         }
-
         #endregion
 
         #region Update_Usercontrollers -- manohar

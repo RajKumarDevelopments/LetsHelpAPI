@@ -130,68 +130,81 @@ namespace BloodGroupApi.Models
         #endregion
 
 
-        #region Send mail2 ----Amrutha (FIXED)
+        #region Send Mail Dynamic
         public string SendMail2(string Email, string sbDesign, string subject)
         {
             try
             {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
                 List<SmtpDetails> listsmtpdetails = GetMailsmtpdetails();
 
-                MailMessage mail = new MailMessage();
-                mail.From = new MailAddress(
-                    listsmtpdetails[0].fromaddress,
-                    "Let's Help",
-                    Encoding.UTF8
-                );
-
-                // ✅ ALWAYS ensure at least one recipient
-
-                // TO → Admin (from DB)  ✅ ALWAYS
-                if (!string.IsNullOrWhiteSpace(listsmtpdetails[0].ToAddress))
+                if (listsmtpdetails == null || listsmtpdetails.Count == 0)
                 {
-                    mail.To.Add(listsmtpdetails[0].ToAddress);
-                }
-                else
-                {
-                    throw new Exception("Admin email (ToAddress) is missing in MailDetails table");
+                    throw new Exception("SMTP details not found.");
                 }
 
-                // CC → User (only if available)
-                if (!string.IsNullOrEmpty(Email) && Email != "undefined")
+                using (MailMessage mail = new MailMessage())
                 {
-                    mail.CC.Add(Email);
+                    mail.From = new MailAddress(
+                        listsmtpdetails[0].fromaddress,
+                        "Let's Help",
+                        Encoding.UTF8
+                    );
+
+                    // TO → Admin (Required)
+                    if (!string.IsNullOrWhiteSpace(listsmtpdetails[0].ToAddress))
+                    {
+                        mail.To.Add(listsmtpdetails[0].ToAddress);
+                    }
+                    else
+                    {
+                        throw new Exception("Admin email (ToAddress) is missing in MailDetails table.");
+                    }
+
+                    // CC → User (Optional)
+                    if (!string.IsNullOrWhiteSpace(Email) &&
+                        !Email.Equals("undefined", StringComparison.OrdinalIgnoreCase))
+                    {
+                        mail.CC.Add(Email);
+                    }
+
+                    // BCC (Optional)
+                    if (!string.IsNullOrWhiteSpace(listsmtpdetails[0].BccAddress))
+                    {
+                        mail.Bcc.Add(listsmtpdetails[0].BccAddress);
+                    }
+
+                    mail.Subject = subject;
+                    mail.Body = sbDesign;
+                    mail.IsBodyHtml = true;
+                    mail.BodyEncoding = Encoding.UTF8;
+                    mail.Priority = MailPriority.High;
+
+                    using (SmtpClient smtp = new SmtpClient())
+                    {
+                        smtp.Host = listsmtpdetails[0].host;
+                        smtp.Port = listsmtpdetails[0].port;
+                        smtp.EnableSsl = (bool)listsmtpdetails[0].enableSsl;
+                        smtp.UseDefaultCredentials = false;
+                        smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        smtp.Credentials = new NetworkCredential(
+                            listsmtpdetails[0].fromaddress,
+                            listsmtpdetails[0].frompassword
+                        );
+
+                        smtp.Send(mail);
+                    }
                 }
-
-
-
-                mail.Subject = subject;
-                mail.IsBodyHtml = true;
-                mail.Body = sbDesign;
-                mail.BodyEncoding = Encoding.UTF8;
-                mail.Priority = MailPriority.High;
-
-                SmtpClient smtp = new SmtpClient(listsmtpdetails[0].host);
-                smtp.Port = listsmtpdetails[0].port;
-
-                // ❗ IMPORTANT FIX
-                smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential(
-                    listsmtpdetails[0].fromaddress,
-                    listsmtpdetails[0].frompassword
-                );
-
-                smtp.EnableSsl = true;
-                smtp.Send(mail);
 
                 return "SUCCESS";
             }
             catch (Exception ex)
             {
-                throw ex;
+                return ex.ToString();
             }
         }
         #endregion
-
 
 
         #region Send mail2 ----Amrutha/Upendra

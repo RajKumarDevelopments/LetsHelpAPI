@@ -229,7 +229,7 @@ namespace BloodGroupApi.Models
             public Int32? Id { get; set; }
             public string host { get; set; }
             public string fromaddress { get; set; }
-            public string frompassword { get; set; }
+            public string frompassword { get; set; } public string phone { get; set; }
             public string ToAddress { get; set; }
             public string BccAddress { get; set; }
             public Boolean? enableSsl { get; set; }

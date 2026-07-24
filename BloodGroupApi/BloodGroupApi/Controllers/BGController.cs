@@ -2248,24 +2248,30 @@ namespace BloodGroupApi.Controllers
 
 
         #region Send Notification  -- suraj,venu
+        [HttpPost]
         public async Task<string> sendNotification()
         {
-            // Create GoogleCredential from the static JSON key string
-            GoogleCredential credential = GoogleCredential.FromJson(JsonKeyString)
-                .CreateScoped(new[] { "https://www.googleapis.com/auth/firebase.messaging" });
+            try
+            {
+                // Create GoogleCredential from the static JSON key string
+                GoogleCredential credential = GoogleCredential.FromJson(JsonKeyString)
+                    .CreateScoped(new[] { "https://www.googleapis.com/auth/firebase.messaging" });
 
-            // Get the access token
-            var token = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
-            var deviceId = System.Web.HttpContext.Current.Request.Form["deviceId"];
-            var message = System.Web.HttpContext.Current.Request.Form["message"];
-            var senderName = System.Web.HttpContext.Current.Request.Form["senderName"];
-            var path = System.Web.HttpContext.Current.Request.Form["path"];
-            var Img = System.Web.HttpContext.Current.Request.Form["Img"];
+                // Get the access token
+                var token = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
+                var deviceId = System.Web.HttpContext.Current.Request.Form["deviceId"];
+                var message = System.Web.HttpContext.Current.Request.Form["message"];
+                var senderName = System.Web.HttpContext.Current.Request.Form["senderName"];
+                var path = System.Web.HttpContext.Current.Request.Form["path"];
+                var Img = System.Web.HttpContext.Current.Request.Form["Img"];
 
-
-
-            var data = BL.SendFCMNotification(deviceId, message, senderName, path, Img, token);
-            return data;
+                var data = BL.SendFCMNotification(deviceId, message, senderName, path, Img, token);
+                return data;
+            }
+            catch (Exception ex)
+            {
+                return "CONTROLLER_ERROR: " + ex.ToString();
+            }
         }
 
 
