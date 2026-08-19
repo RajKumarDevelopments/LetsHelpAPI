@@ -1809,7 +1809,7 @@ namespace BloodGroupApi.Models
 
                                 RegId = A.Field<Int32?>("RegId") + 0,
                                 RoleId = A.Field<Int32?>("RoleId") + 0,
-
+                                UserProtalID = A.Field<string>("UserProtalID") + "",
                                 Weight = A.Field<Int32?>("Weight") + 0,
                                 FullName = A.Field<string>("FullName") + "",
                                 MiddleName = A.Field<string>("MiddleName") + "",

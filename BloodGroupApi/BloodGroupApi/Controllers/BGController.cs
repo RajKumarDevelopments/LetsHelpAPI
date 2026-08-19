@@ -426,6 +426,31 @@ namespace BloodGroupApi.Controllers
         }
         #endregion
 
+        #region SendLeaderWelcomeEmail
+        [HttpPost]
+        public dynamic SendLeaderWelcomeEmail()
+        {
+            try
+            {
+                var email = System.Web.HttpContext.Current.Request.Form["Email"];
+                var firstName = System.Web.HttpContext.Current.Request.Form["FirstName"];
+                var base64Image = System.Web.HttpContext.Current.Request.Form["Base64Image"];
+                var roleId = System.Web.HttpContext.Current.Request.Form["RoleId"];
+                var memberId = System.Web.HttpContext.Current.Request.Form["MemberId"];
+                var regId = System.Web.HttpContext.Current.Request.Form["RegId"];
+
+                var data = mail.SendLeaderWelcomeEmail(email, firstName, base64Image, roleId, memberId, regId);
+                return data;
+            }
+            catch (Exception ex)
+            {
+                exp.ExceptionHandler(ex);
+                BL.saveExceptions((ex.Message + ex.StackTrace).ToString(), "1", "Webapi");
+                throw ex;
+            }
+        }
+        #endregion
+
         #region EnquiryMailTo_BloodCustomers -- Deeksha,Amrutha
         [HttpPost]
         public dynamic EnquiryMailTo_BloodCustomers()

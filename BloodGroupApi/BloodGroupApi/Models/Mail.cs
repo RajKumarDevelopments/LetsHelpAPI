@@ -735,8 +735,370 @@ namespace BloodGroupApi.Models
                 throw ex;
             }
         }
-
         #endregion
+
+        private void SafeLogEmail(string message)
+        {
+            try
+            {
+                string logDir = null;
+                if (System.Web.Hosting.HostingEnvironment.IsHosted)
+                {
+                    logDir = System.Web.Hosting.HostingEnvironment.MapPath("~/");
+                }
+                else if (HttpContext.Current != null && HttpContext.Current.Server != null)
+                {
+                    logDir = HttpContext.Current.Server.MapPath("~/");
+                }
+                
+                if (string.IsNullOrEmpty(logDir))
+                {
+                    logDir = AppDomain.CurrentDomain.BaseDirectory;
+                }
+
+                string logFile = Path.Combine(logDir, "EmailLog.txt");
+                File.AppendAllText(logFile, message);
+            }
+            catch
+            {
+                // Safe logging must never throw exceptions or interrupt business flow
+            }
+        }
+
+        private System.Drawing.Image GetWelcomeCardAsset(string fileName)
+        {
+            try
+            {
+                // 1. Try System.Web.Hosting.HostingEnvironment.MapPath (Works when hosted on IIS / webservices virtual path)
+                try
+                {
+                    if (System.Web.Hosting.HostingEnvironment.IsHosted)
+                    {
+                        string path = System.Web.Hosting.HostingEnvironment.MapPath("~/Image/" + fileName);
+                        if (File.Exists(path))
+                        {
+                            return System.Drawing.Image.FromFile(path);
+                        }
+                    }
+                }
+                catch { }
+
+                // 2. Try HttpContext.Current Server.MapPath
+                try
+                {
+                    if (HttpContext.Current != null)
+                    {
+                        string path = HttpContext.Current.Server.MapPath("~/Image/" + fileName);
+                        if (File.Exists(path))
+                        {
+                            return System.Drawing.Image.FromFile(path);
+                        }
+                    }
+                }
+                catch { }
+
+                // 3. Try AppDomain BaseDirectory
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                string localPath = Path.Combine(baseDir, "Image", fileName);
+                if (File.Exists(localPath))
+                {
+                    return System.Drawing.Image.FromFile(localPath);
+                }
+
+                // 4. Try local dev workspace path
+                string devPath = Path.Combine(@"C:\BloodDonatioProject\LetsHelpAPI\BloodGroupApi\BloodGroupApi\Image", fileName);
+                if (File.Exists(devPath))
+                {
+                    return System.Drawing.Image.FromFile(devPath);
+                }
+
+                // 5. Fallback to production URL path
+                string remoteUrl = "https://letshelp.in/webservices/Image/" + fileName;
+                using (WebClient wc = new WebClient())
+                {
+                    byte[] bytes = wc.DownloadData(remoteUrl);
+                    MemoryStream ms = new MemoryStream(bytes);
+                    return System.Drawing.Image.FromStream(ms);
+                }
+            }
+            catch (Exception ex)
+            {
+                SafeLogEmail($"[{DateTime.Now}] Error loading Welcome Card asset {fileName}: {ex.Message}\n");
+                return null;
+            }
+        }
+
+        public byte[] GenerateWelcomeCard(string firstName, string memberId, string regDate)
+        {
+            try
+            {
+                using (System.Drawing.Image templateImage = GetWelcomeCardAsset("WelcomeCardTemplate.jpg"))
+                {
+                    if (templateImage == null)
+                    {
+                        return null;
+                    }
+
+                    using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(templateImage))
+                    {
+                        using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bitmap))
+                        {
+                            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+                            // 1. Font Selection (Gordita Medium -> fallback Segoe UI / Trebuchet MS / Arial)
+                            System.Drawing.FontFamily greetingFamily;
+                            try { greetingFamily = new System.Drawing.FontFamily("Gordita"); }
+                            catch {
+                                try { greetingFamily = new System.Drawing.FontFamily("Segoe UI"); }
+                                catch { greetingFamily = System.Drawing.FontFamily.GenericSansSerif; }
+                            }
+
+                            // Draw "Hi, I'm <FirstName>." (Font Size: 22px as specified)
+                            string nameToDraw = string.IsNullOrWhiteSpace(firstName) ? "Member" : firstName.Trim();
+                            string prefixText = "Hi, I'm ";
+                            string suffixText = nameToDraw + ".";
+
+                            using (System.Drawing.Font fontPrefix = new System.Drawing.Font(greetingFamily, 22f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel))
+                            using (System.Drawing.Font fontSuffix = new System.Drawing.Font(greetingFamily, 22f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel))
+                            using (System.Drawing.Brush brushDark = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(17, 17, 17)))
+                            using (System.Drawing.Brush brushRed = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(166, 25, 25)))
+                            {
+                                System.Drawing.SizeF prefixSize = g.MeasureString(prefixText, fontPrefix);
+                                System.Drawing.SizeF suffixSize = g.MeasureString(suffixText, fontSuffix);
+                                float totalWidth = prefixSize.Width + suffixSize.Width;
+
+                                float startX = (bitmap.Width - totalWidth) / 2f;
+                                float startY = 246f;
+
+                                g.DrawString(prefixText, fontPrefix, brushDark, startX, startY);
+                                g.DrawString(suffixText, fontSuffix, brushRed, startX + prefixSize.Width - 4, startY);
+                            }
+
+                            // 2. Draw QR Code (clean without center logo)
+                            using (System.Drawing.Image qrImage = GetWelcomeCardAsset("app_qr_code.png"))
+                            {
+                                if (qrImage != null)
+                                {
+                                    int qrBoxX = 262;
+                                    int qrBoxY = 530;
+                                    int qrBoxW = 180;
+                                    int qrBoxH = 180;
+
+                                    g.DrawImage(qrImage, qrBoxX, qrBoxY, qrBoxW, qrBoxH);
+                                }
+                            }
+
+                            // 3. Font Selection (Lato Bold -> fallback Segoe UI / Arial)
+                            System.Drawing.FontFamily idDateFamily;
+                            try { idDateFamily = new System.Drawing.FontFamily("Lato"); }
+                            catch {
+                                try { idDateFamily = new System.Drawing.FontFamily("Segoe UI"); }
+                                catch { idDateFamily = System.Drawing.FontFamily.GenericSansSerif; }
+                            }
+
+                            // Size 15.5px for refined, balanced look
+                            using (System.Drawing.Font fontIdDate = new System.Drawing.Font(idDateFamily, 15.5f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel))
+                            using (System.Drawing.Brush brushRed = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(166, 25, 25)))
+                            {
+                                // 3. Draw Member ID (under "Member ID:")
+                                string memberIdText = string.IsNullOrWhiteSpace(memberId) ? "LH0000011" : memberId.Trim();
+                                g.DrawString(memberIdText, fontIdDate, brushRed, 170f, 907f);
+
+                                // 4. Draw Registration Date (under "Proud Member Since:")
+                                string regDateText = string.IsNullOrWhiteSpace(regDate) ? DateTime.Now.ToString("dd MMMM yyyy") : regDate.Trim();
+                                g.DrawString(regDateText, fontIdDate, brushRed, 426f, 907f);
+                            }
+                    }
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                        return ms.ToArray();
+                    }
+                }
+            }
+            }
+            catch (Exception ex)
+            {
+                SafeLogEmail($"[{DateTime.Now}] Error generating card image: {ex.Message}\n{ex.StackTrace}\n");
+                return null;
+            }
+        }
+
+        public string SendLeaderWelcomeEmail(string email, string firstName, string base64Image, string roleId = "4", string memberId = "", string regId = "")
+        {
+            try
+            {
+                SafeLogEmail($"\n[{DateTime.Now}] Starting SendLeaderWelcomeEmail for {email} (RoleId: {roleId}, MemberId: {memberId})...\n");
+
+                byte[] imageBytes = null;
+                if (!string.IsNullOrEmpty(base64Image))
+                {
+                    string base64Data = base64Image;
+                    if (base64Image.Contains(","))
+                    {
+                        base64Data = base64Image.Substring(base64Image.IndexOf(",") + 1);
+                    }
+                    imageBytes = Convert.FromBase64String(base64Data);
+                    SafeLogEmail($"[{DateTime.Now}] Base64 image provided from client. Size: {imageBytes.Length} bytes.\n");
+                }
+
+                if (imageBytes == null || imageBytes.Length == 0)
+                {
+                    SafeLogEmail($"[{DateTime.Now}] Generating Welcome Card image on server side...\n");
+                    string cardMemberId = memberId;
+                    if (string.IsNullOrWhiteSpace(cardMemberId) && !string.IsNullOrWhiteSpace(regId))
+                    {
+                        cardMemberId = "LH" + regId.PadLeft(7, '0');
+                    }
+                    string cardRegDate = DateTime.Now.ToString("dd MMMM yyyy");
+                    imageBytes = GenerateWelcomeCard(firstName, cardMemberId, cardRegDate);
+                    if (imageBytes != null && imageBytes.Length > 0)
+                    {
+                        SafeLogEmail($"[{DateTime.Now}] Server-side Welcome Card successfully generated. Size: {imageBytes.Length} bytes.\n");
+                    }
+                    else
+                    {
+                        SafeLogEmail($"[{DateTime.Now}] WARNING: Server-side Welcome Card generation returned null or empty.\n");
+                    }
+                }
+
+                bool isDonor = (roleId == "2");
+
+                StringBuilder sbDesign = new StringBuilder();
+                sbDesign.Append("<!DOCTYPE html>");
+                sbDesign.Append("<html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'></head>");
+                sbDesign.Append("<body style='margin:0; padding:0; background-color:#f4f6f8; font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;'>");
+                sbDesign.Append("<table width='100%' cellpadding='0' cellspacing='0' border='0' style='background-color:#f4f6f8; padding: 25px 15px;'>");
+                sbDesign.Append("<tr><td align='center'>");
+                sbDesign.Append("<table width='100%' cellpadding='0' cellspacing='0' border='0' style='max-width: 600px; background-color:#ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #eaeaea;'>");
+
+                // Header Banner
+                sbDesign.Append("<tr><td style='background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%); padding: 28px 25px; text-align: center; color: #ffffff;'>");
+                sbDesign.Append("<h1 style='margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.5px;'>LET'S HELP FOUNDATION</h1>");
+                sbDesign.Append("<p style='margin: 5px 0 0 0; font-size: 13px; opacity: 0.92; letter-spacing: 1px; text-transform: uppercase;'>Together for a Noble Cause</p>");
+                sbDesign.Append("</td></tr>");
+
+                // Content Body
+                sbDesign.Append("<tr><td style='padding: 30px 25px; color: #2d3748; line-height: 1.65; font-size: 15px;'>");
+                sbDesign.Append($"<p style='font-size: 16px; margin-top: 0;'>Dear <b>{firstName}</b>,</p>");
+
+                if (isDonor)
+                {
+                    sbDesign.Append("<p style='color: #1a202c;'>Welcome to the <b style='color: #c62828;'>Let's Help Foundation</b> family!</p>");
+                    sbDesign.Append("<p>Thank you for registering as a blood donor. Your noble decision to donate blood has the power to save lives and bring hope to families in critical times. By joining our platform, you have become a vital part of a community dedicated to ensuring that no one suffers due to the unavailability of blood.</p>");
+                    sbDesign.Append("<div style='background-color: #fff5f5; border-left: 4px solid #e53e3e; padding: 14px 18px; border-radius: 6px; margin: 20px 0;'>");
+                    sbDesign.Append("<p style='margin: 0 0 8px 0; font-weight: bold; color: #9b2c2c;'>As a registered Donor on Let's Help:</p>");
+                    sbDesign.Append("<ul style='margin: 0; padding-left: 20px; color: #4a5568;'>");
+                    sbDesign.Append("<li style='margin-bottom: 6px;'>You will receive notifications whenever an urgent blood request matches your blood group and location.</li>");
+                    sbDesign.Append("<li style='margin-bottom: 6px;'>You can keep your donation status updated so patient families and coordinators can reach out when needed.</li>");
+                    sbDesign.Append("<li>You inspire others in your community to step forward and donate blood.</li>");
+                    sbDesign.Append("</ul></div>");
+                }
+                else
+                {
+                    sbDesign.Append("<p style='color: #1a202c;'>Congratulations, and welcome to the <b style='color: #c62828;'>Let's Help Leadership Team</b>!</p>");
+                    sbDesign.Append("<p>Thank you for stepping forward to make a difference. By becoming a Let's Help Leader, you've joined a community of volunteers committed to creating awareness, encouraging blood donation, and helping save lives.</p>");
+                    sbDesign.Append("<div style='background-color: #fff5f5; border-left: 4px solid #e53e3e; padding: 14px 18px; border-radius: 6px; margin: 20px 0;'>");
+                    sbDesign.Append("<p style='margin: 0 0 8px 0; font-weight: bold; color: #9b2c2c;'>As a Leader, you can:</p>");
+                    sbDesign.Append("<ul style='margin: 0; padding-left: 20px; color: #4a5568;'>");
+                    sbDesign.Append("<li style='margin-bottom: 6px;'>Register blood donors who may not be able to use the app themselves.</li>");
+                    sbDesign.Append("<li style='margin-bottom: 6px;'>Organize blood donation awareness presentations in schools, colleges, and communities.</li>");
+                    sbDesign.Append("<li style='margin-bottom: 6px;'>Guide and inspire others to become regular blood donors.</li>");
+                    sbDesign.Append("<li style='margin-bottom: 6px;'>Spread awareness using our official brochures, banners, and social media materials.</li>");
+                    sbDesign.Append("<li>Help build a stronger and more connected donor network in your community.</li>");
+                    sbDesign.Append("</ul></div>");
+                }
+
+                if (isDonor)
+                {
+                    sbDesign.Append("<p>Every donor is a lifesaver, and every donation counts. We are immensely grateful to have you with us on this noble mission.</p>");
+                    sbDesign.Append("<p>Thank you once again for your commitment to saving lives.</p>");
+                }
+                else
+                {
+                    sbDesign.Append("<p>Every person you educate, every donor you register, and every awareness session you organize has the potential to save lives. Together, we can ensure that no one suffers due to the unavailability of blood.</p>");
+                    sbDesign.Append("<p>Thank you once again for becoming a Let's Help Leader. We look forward to seeing the positive impact you'll create.</p>");
+                }
+
+                sbDesign.Append("<p style='font-size: 13px; color: #718096; margin-top: 20px;'><i>(Please find your official Welcome Membership Card attached to this email.)</i></p>");
+
+                // Sign-off
+                sbDesign.Append("<div style='margin-top: 25px; padding-top: 18px; border-top: 1px solid #edf2f7;'>");
+                sbDesign.Append("<p style='margin: 0; color: #718096; font-size: 14px;'>Warm regards,</p>");
+                sbDesign.Append("<p style='margin: 4px 0 0 0; font-size: 15px; font-weight: bold; color: #1a202c;'>RK</p>");
+                sbDesign.Append("<p style='margin: 2px 0 0 0; font-size: 13px; color: #e53e3e; font-weight: 600;'>Director, Let's Help Foundation</p>");
+                sbDesign.Append("<p style='margin: 2px 0 0 0; font-size: 12px; color: #a0aec0;'>Together for a Noble Cause</p>");
+                sbDesign.Append("<div style='margin-top: 10px;'><img src='https://letshelp.in/webservices/Image/logo.png' alt='Let&apos;s Help Foundation' style='height: 38px; width: auto; display: block;' /></div>");
+                sbDesign.Append("</div>");
+
+                sbDesign.Append("</td></tr>");
+
+                // Footer
+                sbDesign.Append("<tr><td style='background-color: #f7fafc; padding: 16px 25px; text-align: center; border-top: 1px solid #edf2f7; font-size: 12px; color: #a0aec0;'>");
+                sbDesign.Append("<p style='margin: 0;'>© " + DateTime.Now.Year + " Let's Help Foundation. All rights reserved.</p>");
+                sbDesign.Append("<p style='margin: 4px 0 0 0;'>Website: <a href='https://letshelp.in' style='color: #e53e3e; text-decoration: none;'>letshelp.in</a></p>");
+                sbDesign.Append("</td></tr>");
+
+                sbDesign.Append("</table></td></tr></table></body></html>");
+
+                List<SmtpDetails> listsmtpdetails = GetMailsmtpdetails();
+                if (listsmtpdetails == null || listsmtpdetails.Count == 0)
+                {
+                    SafeLogEmail($"[{DateTime.Now}] ERROR: SMTP Details table is empty.\n");
+                    throw new Exception("SMTP configuration details not found");
+                }
+                var smtpDetails = listsmtpdetails[0];
+                SafeLogEmail($"[{DateTime.Now}] Fetched SMTP Details: Host={smtpDetails.host}, Port={smtpDetails.port}, From={smtpDetails.fromaddress}\n");
+
+                MailMessage mail = new MailMessage();
+                mail.From = new MailAddress(smtpDetails.fromaddress, "Let's Help", Encoding.UTF8);
+                
+                if (!string.IsNullOrWhiteSpace(email) && email != "undefined")
+                {
+                    mail.To.Add(email.Trim());
+                }
+                else
+                {
+                    SafeLogEmail($"[{DateTime.Now}] ERROR: User email is missing or undefined.\n");
+                    throw new Exception("User email is missing");
+                }
+
+                mail.Subject = isDonor ? "Welcome to Let's Help Foundation - Thank You for Becoming a Donor!" : "Welcome to the Let's Help Leadership Team!";
+                mail.IsBodyHtml = true;
+                mail.Priority = MailPriority.High;
+                mail.Body = sbDesign.ToString();
+                mail.BodyEncoding = Encoding.UTF8;
+
+                if (imageBytes != null && imageBytes.Length > 0)
+                {
+                    // Add only as downloadable attachment
+                    MemoryStream msAttachment = new MemoryStream(imageBytes);
+                    mail.Attachments.Add(new Attachment(msAttachment, "Welcome_Card.png", "image/png"));
+                }
+
+                SafeLogEmail($"[{DateTime.Now}] Configuring SmtpClient...\n");
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12; // Ensure modern TLS is used
+                SmtpClient smtp = new SmtpClient(smtpDetails.host);
+                smtp.Port = smtpDetails.port;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new NetworkCredential(smtpDetails.fromaddress, smtpDetails.frompassword);
+                smtp.EnableSsl = (smtpDetails.enableSsl ?? true);
+                
+                SafeLogEmail($"[{DateTime.Now}] Attempting to send email via SMTP...\n");
+                smtp.Send(mail);
+                SafeLogEmail($"[{DateTime.Now}] Email sent successfully via SMTP!\n");
+
+                return "SUCCESS";
+            }
+            catch (Exception ex)
+            {
+                SafeLogEmail($"[{DateTime.Now}] EXCEPTION: {ex.Message}\nStack Trace: {ex.StackTrace}\n");
+                throw ex;
+            }
+        }
 
         public string SendMail1CC(string Email, string sbDesign, string Subject, byte[] attachmentBytes)
         {
