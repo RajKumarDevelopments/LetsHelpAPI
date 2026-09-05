@@ -765,6 +765,31 @@ namespace BloodGroupApi.Models
             }
         }
 
+        private string GetAssetFilePath(string fileName)
+        {
+            try
+            {
+                if (System.Web.Hosting.HostingEnvironment.IsHosted)
+                {
+                    string path = System.Web.Hosting.HostingEnvironment.MapPath("~/Image/" + fileName);
+                    if (File.Exists(path)) return path;
+                }
+                if (HttpContext.Current != null && HttpContext.Current.Server != null)
+                {
+                    string path = HttpContext.Current.Server.MapPath("~/Image/" + fileName);
+                    if (File.Exists(path)) return path;
+                }
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                string localPath = Path.Combine(baseDir, "Image", fileName);
+                if (File.Exists(localPath)) return localPath;
+
+                string devPath = Path.Combine(@"C:\BloodDonatioProject\LetsHelpAPI\BloodGroupApi\BloodGroupApi\Image", fileName);
+                if (File.Exists(devPath)) return devPath;
+            }
+            catch { }
+            return null;
+        }
+
         private System.Drawing.Image GetWelcomeCardAsset(string fileName)
         {
             try
@@ -828,7 +853,7 @@ namespace BloodGroupApi.Models
             }
         }
 
-        public byte[] GenerateWelcomeCard(string firstName, string memberId, string regDate)
+        public byte[] GenerateWelcomeCard(string firstName, string memberId, string regDate, string referralCode = "")
         {
             try
             {
@@ -847,6 +872,8 @@ namespace BloodGroupApi.Models
                             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
                             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
 
+                            float scale = bitmap.Width / 703.25f;
+
                             // 1. Font Selection (Gordita Medium -> fallback Segoe UI / Trebuchet MS / Arial)
                             System.Drawing.FontFamily greetingFamily;
                             try { greetingFamily = new System.Drawing.FontFamily("Gordita"); }
@@ -860,8 +887,8 @@ namespace BloodGroupApi.Models
                             string prefixText = "Hi, I'm ";
                             string suffixText = nameToDraw + ".";
 
-                            using (System.Drawing.Font fontPrefix = new System.Drawing.Font(greetingFamily, 22f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel))
-                            using (System.Drawing.Font fontSuffix = new System.Drawing.Font(greetingFamily, 22f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel))
+                            using (System.Drawing.Font fontPrefix = new System.Drawing.Font(greetingFamily, 22f * scale, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel))
+                            using (System.Drawing.Font fontSuffix = new System.Drawing.Font(greetingFamily, 22f * scale, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel))
                             using (System.Drawing.Brush brushDark = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(17, 17, 17)))
                             using (System.Drawing.Brush brushRed = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(166, 25, 25)))
                             {
@@ -870,45 +897,67 @@ namespace BloodGroupApi.Models
                                 float totalWidth = prefixSize.Width + suffixSize.Width;
 
                                 float startX = (bitmap.Width - totalWidth) / 2f;
-                                float startY = 246f;
+                                float startY = 246f * scale;
 
                                 g.DrawString(prefixText, fontPrefix, brushDark, startX, startY);
-                                g.DrawString(suffixText, fontSuffix, brushRed, startX + prefixSize.Width - 4, startY);
+                                g.DrawString(suffixText, fontSuffix, brushRed, startX + prefixSize.Width - (4f * scale), startY);
                             }
 
-                            // 2. Draw QR Code (clean without center logo)
+                            // 2. Draw QR Code (centered inside the red box outline)
                             using (System.Drawing.Image qrImage = GetWelcomeCardAsset("app_qr_code.png"))
                             {
                                 if (qrImage != null)
                                 {
-                                    int qrBoxX = 262;
-                                    int qrBoxY = 530;
-                                    int qrBoxW = 180;
-                                    int qrBoxH = 180;
+                                    float qrBoxX = 273.125f * scale;
+                                    float qrBoxY = 528f * scale;
+                                    float qrBoxW = 180f * scale;
+                                    float qrBoxH = 180f * scale;
 
                                     g.DrawImage(qrImage, qrBoxX, qrBoxY, qrBoxW, qrBoxH);
                                 }
                             }
 
                             // 3. Font Selection (Lato Bold -> fallback Segoe UI / Arial)
-                            System.Drawing.FontFamily idDateFamily;
-                            try { idDateFamily = new System.Drawing.FontFamily("Lato"); }
+                            System.Drawing.FontFamily latoFamily;
+                            try { latoFamily = new System.Drawing.FontFamily("Lato"); }
                             catch {
-                                try { idDateFamily = new System.Drawing.FontFamily("Segoe UI"); }
-                                catch { idDateFamily = System.Drawing.FontFamily.GenericSansSerif; }
+                                try { latoFamily = new System.Drawing.FontFamily("Segoe UI"); }
+                                catch { latoFamily = System.Drawing.FontFamily.GenericSansSerif; }
                             }
 
-                            // Size 15.5px for refined, balanced look
-                            using (System.Drawing.Font fontIdDate = new System.Drawing.Font(idDateFamily, 15.5f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel))
+                            // 3. Draw Reference Code / Referral Code (Font Size: 18px, Lato Bold as specified)
+                            if (!string.IsNullOrWhiteSpace(referralCode))
+                            {
+                                string refLabelText = "Referral Code : ";
+                                string refCodeText = referralCode.Trim();
+
+                                using (System.Drawing.Font fontRef = new System.Drawing.Font(latoFamily, 18f * scale, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel))
+                                using (System.Drawing.Brush brushDark = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(17, 17, 17)))
+                                using (System.Drawing.Brush brushRed = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(166, 25, 25)))
+                                {
+                                    System.Drawing.SizeF refLabelSize = g.MeasureString(refLabelText, fontRef);
+                                    System.Drawing.SizeF refCodeSize = g.MeasureString(refCodeText, fontRef);
+                                    float refTotalWidth = refLabelSize.Width + refCodeSize.Width;
+
+                                    float refStartX = (bitmap.Width - refTotalWidth) / 2f;
+                                    float refStartY = 3180f;
+
+                                    g.DrawString(refLabelText, fontRef, brushDark, refStartX, refStartY);
+                                    g.DrawString(refCodeText, fontRef, brushRed, refStartX + refLabelSize.Width - (4f * scale), refStartY);
+                                }
+                            }
+
+                            // 4. Draw Member ID and Registration Date (Font Size: 21.5px, Lato Bold as specified)
+                            using (System.Drawing.Font fontIdDate = new System.Drawing.Font(latoFamily, 21.5f * scale, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel))
                             using (System.Drawing.Brush brushRed = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(166, 25, 25)))
                             {
-                                // 3. Draw Member ID (under "Member ID:")
+                                // Draw Member ID (under "Member ID:")
                                 string memberIdText = string.IsNullOrWhiteSpace(memberId) ? "LH0000011" : memberId.Trim();
-                                g.DrawString(memberIdText, fontIdDate, brushRed, 170f, 907f);
+                                g.DrawString(memberIdText, fontIdDate, brushRed, 181.5f * scale, 3755f);
 
-                                // 4. Draw Registration Date (under "Proud Member Since:")
+                                // Draw Registration Date (under "Proud Member Since:")
                                 string regDateText = string.IsNullOrWhiteSpace(regDate) ? DateTime.Now.ToString("dd MMMM yyyy") : regDate.Trim();
-                                g.DrawString(regDateText, fontIdDate, brushRed, 426f, 907f);
+                                g.DrawString(regDateText, fontIdDate, brushRed, 436f * scale, 3755f);
                             }
                     }
 
@@ -927,11 +976,199 @@ namespace BloodGroupApi.Models
             }
         }
 
-        public string SendLeaderWelcomeEmail(string email, string firstName, string base64Image, string roleId = "4", string memberId = "", string regId = "")
+        public byte[] GenerateLeaderIDCardFront(string fullName, string memberId, string title, string bloodGroup, string email, string phoneNo)
         {
             try
             {
-                SafeLogEmail($"\n[{DateTime.Now}] Starting SendLeaderWelcomeEmail for {email} (RoleId: {roleId}, MemberId: {memberId})...\n");
+                using (System.Drawing.Image templateImage = GetWelcomeCardAsset("LeaderIDCardFront.jpg"))
+                {
+                    if (templateImage == null)
+                    {
+                        return null;
+                    }
+
+                    using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(templateImage))
+                    {
+                        using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bitmap))
+                        {
+                            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+                            // 1. Font for Name (Alegreya -> fallback Times New Roman / Georgia / Segoe UI)
+                            System.Drawing.Text.PrivateFontCollection pfc = null;
+                            System.Drawing.FontFamily nameFamily = null;
+                            try
+                            {
+                                string alegreyaPath = GetAssetFilePath("Alegreya.ttf");
+                                if (!string.IsNullOrEmpty(alegreyaPath) && File.Exists(alegreyaPath))
+                                {
+                                    pfc = new System.Drawing.Text.PrivateFontCollection();
+                                    pfc.AddFontFile(alegreyaPath);
+                                    if (pfc.Families.Length > 0)
+                                    {
+                                        nameFamily = pfc.Families[0];
+                                    }
+                                }
+                            }
+                            catch { }
+
+                            if (nameFamily == null)
+                            {
+                                try { nameFamily = new System.Drawing.FontFamily("Alegreya"); }
+                                catch
+                                {
+                                    try { nameFamily = new System.Drawing.FontFamily("Times New Roman"); }
+                                    catch { nameFamily = System.Drawing.FontFamily.GenericSerif; }
+                                }
+                            }
+
+                            // Draw Full Name (Centered)
+                            string displayName = string.IsNullOrWhiteSpace(fullName) ? "Leader Member" : fullName.Trim();
+                            float nameFontSize = 90f;
+                            using (System.Drawing.Brush nameBrush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(25, 25, 25)))
+                            {
+                                using (System.Drawing.Font testFont = new System.Drawing.Font(nameFamily, nameFontSize, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel))
+                                {
+                                    System.Drawing.SizeF size = g.MeasureString(displayName, testFont);
+                                    if (size.Width > 1600f)
+                                    {
+                                        nameFontSize = nameFontSize * (1600f / size.Width);
+                                    }
+                                }
+
+                                using (System.Drawing.Font nameFont = new System.Drawing.Font(nameFamily, nameFontSize, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel))
+                                {
+                                    System.Drawing.SizeF nameSize = g.MeasureString(displayName, nameFont);
+                                    float nameX = (bitmap.Width - nameSize.Width) / 2f;
+                                    float nameY = 1320f;
+                                    g.DrawString(displayName, nameFont, nameBrush, nameX, nameY);
+                                }
+                            }
+
+                            // 2. Font for Details (Times New Roman -> fallback Georgia / Segoe UI)
+                            System.Drawing.FontFamily detailsFamily;
+                            try { detailsFamily = new System.Drawing.FontFamily("Times New Roman"); }
+                            catch
+                            {
+                                try { detailsFamily = new System.Drawing.FontFamily("Georgia"); }
+                                catch { detailsFamily = System.Drawing.FontFamily.GenericSerif; }
+                            }
+
+                            float valX = 835f;
+                            using (System.Drawing.Brush valBrush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(35, 35, 35)))
+                            using (System.Drawing.Font valFont = new System.Drawing.Font(detailsFamily, 52f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel))
+                            {
+                                // USER ID
+                                string displayUserId = string.IsNullOrWhiteSpace(memberId) ? "LHF000123" : memberId.Trim();
+                                g.DrawString(displayUserId, valFont, valBrush, valX, 1538f);
+
+                                // TITLE
+                                string displayTitle = string.IsNullOrWhiteSpace(title) ? "Community Leader" : title.Trim();
+                                g.DrawString(displayTitle, valFont, valBrush, valX, 1724f);
+
+                                // BLOOD GRP
+                                string displayBloodGroup = string.IsNullOrWhiteSpace(bloodGroup) ? "-" : bloodGroup.Trim();
+                                g.DrawString(displayBloodGroup, valFont, valBrush, valX, 1904f);
+
+                                // EMAIL
+                                string displayEmail = string.IsNullOrWhiteSpace(email) ? "-" : email.Trim();
+                                System.Drawing.SizeF emailSize = g.MeasureString(displayEmail, valFont);
+                                if (emailSize.Width > 1050f)
+                                {
+                                    float emailFontSize = 52f * (1050f / emailSize.Width);
+                                    using (System.Drawing.Font emailFont = new System.Drawing.Font(detailsFamily, emailFontSize, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel))
+                                    {
+                                        g.DrawString(displayEmail, emailFont, valBrush, valX, 2085f + (52f - emailFontSize) / 2f);
+                                    }
+                                }
+                                else
+                                {
+                                    g.DrawString(displayEmail, valFont, valBrush, valX, 2085f);
+                                }
+
+                                // PHONE NO
+                                string displayPhone = string.IsNullOrWhiteSpace(phoneNo) ? "-" : phoneNo.Trim();
+                                if (!displayPhone.StartsWith("+") && displayPhone.Length == 10)
+                                {
+                                    displayPhone = "+91 " + displayPhone;
+                                }
+                                g.DrawString(displayPhone, valFont, valBrush, valX, 2275f);
+                            }
+
+                            if (pfc != null)
+                            {
+                                pfc.Dispose();
+                            }
+                        }
+
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                            return ms.ToArray();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SafeLogEmail($"[{DateTime.Now}] Error generating Leader ID Card Front: {ex.Message}\n{ex.StackTrace}\n");
+                return null;
+            }
+        }
+
+        public byte[] GenerateLeaderIDCardBack()
+        {
+            try
+            {
+                using (System.Drawing.Image templateImage = GetWelcomeCardAsset("LeaderIDCardBack.jpg"))
+                {
+                    if (templateImage == null)
+                    {
+                        return null;
+                    }
+
+                    using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(templateImage))
+                    {
+                        using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bitmap))
+                        {
+                            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+                            using (System.Drawing.Image qrImage = GetWelcomeCardAsset("app_qr_code.png"))
+                            {
+                                if (qrImage != null)
+                                {
+                                    // Golden square frame bounds: X: 569..1432 (W: 863), Y: 1219..2077 (H: 858)
+                                    int qrX = 569 + 15;
+                                    int qrY = 1219 + 15;
+                                    int qrW = 863 - 30;
+                                    int qrH = 858 - 30;
+                                    g.DrawImage(qrImage, qrX, qrY, qrW, qrH);
+                                }
+                            }
+                        }
+
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                            return ms.ToArray();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SafeLogEmail($"[{DateTime.Now}] Error generating Leader ID Card Back: {ex.Message}\n{ex.StackTrace}\n");
+                return null;
+            }
+        }
+
+        public string SendLeaderWelcomeEmail(string email, string firstName, string base64Image, string roleId = "4", string memberId = "", string regId = "", string fullName = "", string bloodGroup = "", string phoneNumber = "", string title = "", string referralCode = "")
+        {
+            try
+            {
+                SafeLogEmail($"\n[{DateTime.Now}] Starting SendLeaderWelcomeEmail for {email} (RoleId: {roleId}, MemberId: {memberId}, ReferralCode: {referralCode})...\n");
 
                 byte[] imageBytes = null;
                 if (!string.IsNullOrEmpty(base64Image))
@@ -945,16 +1182,17 @@ namespace BloodGroupApi.Models
                     SafeLogEmail($"[{DateTime.Now}] Base64 image provided from client. Size: {imageBytes.Length} bytes.\n");
                 }
 
+                string cardMemberId = memberId;
+                if (string.IsNullOrWhiteSpace(cardMemberId) && !string.IsNullOrWhiteSpace(regId))
+                {
+                    cardMemberId = "LH" + regId.PadLeft(7, '0');
+                }
+
                 if (imageBytes == null || imageBytes.Length == 0)
                 {
                     SafeLogEmail($"[{DateTime.Now}] Generating Welcome Card image on server side...\n");
-                    string cardMemberId = memberId;
-                    if (string.IsNullOrWhiteSpace(cardMemberId) && !string.IsNullOrWhiteSpace(regId))
-                    {
-                        cardMemberId = "LH" + regId.PadLeft(7, '0');
-                    }
                     string cardRegDate = DateTime.Now.ToString("dd MMMM yyyy");
-                    imageBytes = GenerateWelcomeCard(firstName, cardMemberId, cardRegDate);
+                    imageBytes = GenerateWelcomeCard(firstName, cardMemberId, cardRegDate, referralCode);
                     if (imageBytes != null && imageBytes.Length > 0)
                     {
                         SafeLogEmail($"[{DateTime.Now}] Server-side Welcome Card successfully generated. Size: {imageBytes.Length} bytes.\n");
@@ -965,51 +1203,68 @@ namespace BloodGroupApi.Models
                     }
                 }
 
+                bool isLeader = (roleId == "4");
                 bool isDonor = (roleId == "2");
 
                 StringBuilder sbDesign = new StringBuilder();
                 sbDesign.Append("<!DOCTYPE html>");
-                sbDesign.Append("<html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'></head>");
+                sbDesign.Append("<html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+                sbDesign.Append("<style>");
+                sbDesign.Append("@media only screen and (max-width: 600px) {");
+                sbDesign.Append("  .email-container { width: 100% !important; max-width: 100% !important; }");
+                sbDesign.Append("  .content-cell { padding: 22px 18px !important; }");
+                sbDesign.Append("  .header-cell { padding: 22px 18px !important; }");
+                sbDesign.Append("}");
+                sbDesign.Append("</style>");
+                sbDesign.Append("</head>");
                 sbDesign.Append("<body style='margin:0; padding:0; background-color:#f4f6f8; font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;'>");
                 sbDesign.Append("<table width='100%' cellpadding='0' cellspacing='0' border='0' style='background-color:#f4f6f8; padding: 25px 15px;'>");
                 sbDesign.Append("<tr><td align='center'>");
-                sbDesign.Append("<table width='100%' cellpadding='0' cellspacing='0' border='0' style='max-width: 600px; background-color:#ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #eaeaea;'>");
+                sbDesign.Append("<table class='email-container' width='100%' cellpadding='0' cellspacing='0' border='0' style='max-width: 720px; background-color:#ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #eaeaea; margin: 0 auto;'>");
 
                 // Header Banner
-                sbDesign.Append("<tr><td style='background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%); padding: 28px 25px; text-align: center; color: #ffffff;'>");
-                sbDesign.Append("<h1 style='margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.5px;'>LET'S HELP FOUNDATION</h1>");
+                sbDesign.Append("<tr><td class='header-cell' style='background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%); padding: 28px 32px; text-align: center; color: #ffffff;'>");
+                sbDesign.Append("<h1 style='margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 0.5px;'>LET'S HELP FOUNDATION</h1>");
                 sbDesign.Append("<p style='margin: 5px 0 0 0; font-size: 13px; opacity: 0.92; letter-spacing: 1px; text-transform: uppercase;'>Together for a Noble Cause</p>");
                 sbDesign.Append("</td></tr>");
 
                 // Content Body
-                sbDesign.Append("<tr><td style='padding: 30px 25px; color: #2d3748; line-height: 1.65; font-size: 15px;'>");
-                sbDesign.Append($"<p style='font-size: 16px; margin-top: 0;'>Dear <b>{firstName}</b>,</p>");
+                sbDesign.Append("<tr><td class='content-cell' style='padding: 32px 35px; color: #2d3748; line-height: 1.65; font-size: 15px;'>");
+                string saluteName = !string.IsNullOrWhiteSpace(fullName) ? fullName : firstName;
+                sbDesign.Append($"<p style='font-size: 16px; margin-top: 0;'>Dear <b>{saluteName}</b>,</p>");
 
                 if (isDonor)
                 {
                     sbDesign.Append("<p style='color: #1a202c;'>Welcome to the <b style='color: #c62828;'>Let's Help Foundation</b> family!</p>");
                     sbDesign.Append("<p>Thank you for registering as a blood donor. Your noble decision to donate blood has the power to save lives and bring hope to families in critical times. By joining our platform, you have become a vital part of a community dedicated to ensuring that no one suffers due to the unavailability of blood.</p>");
-                    sbDesign.Append("<div style='background-color: #fff5f5; border-left: 4px solid #e53e3e; padding: 14px 18px; border-radius: 6px; margin: 20px 0;'>");
-                    sbDesign.Append("<p style='margin: 0 0 8px 0; font-weight: bold; color: #9b2c2c;'>As a registered Donor on Let's Help:</p>");
-                    sbDesign.Append("<ul style='margin: 0; padding-left: 20px; color: #4a5568;'>");
-                    sbDesign.Append("<li style='margin-bottom: 6px;'>You will receive notifications whenever an urgent blood request matches your blood group and location.</li>");
-                    sbDesign.Append("<li style='margin-bottom: 6px;'>You can keep your donation status updated so patient families and coordinators can reach out when needed.</li>");
-                    sbDesign.Append("<li>You inspire others in your community to step forward and donate blood.</li>");
+                    sbDesign.Append("<div style='background-color: #fff5f5; border-left: 4px solid #e53e3e; padding: 18px 22px; border-radius: 8px; margin: 24px 0;'>");
+                    sbDesign.Append("<p style='margin: 0 0 10px 0; font-weight: bold; color: #9b2c2c; font-size: 16px;'>As a registered Donor on Let's Help:</p>");
+                    sbDesign.Append("<ul style='margin: 0; padding-left: 20px; color: #4a5568; line-height: 1.6;'>");
+                    sbDesign.Append("<li style='margin-bottom: 8px;'>You will receive notifications whenever an urgent blood request matches your blood group and location.</li>");
+                    sbDesign.Append("<li style='margin-bottom: 8px;'>You can keep your donation status updated so patient families and coordinators can reach out when needed.</li>");
+                    sbDesign.Append("<li style='margin-bottom: 0;'>You inspire others in your community to step forward and donate blood.</li>");
                     sbDesign.Append("</ul></div>");
                 }
                 else
                 {
                     sbDesign.Append("<p style='color: #1a202c;'>Congratulations, and welcome to the <b style='color: #c62828;'>Let's Help Leadership Team</b>!</p>");
                     sbDesign.Append("<p>Thank you for stepping forward to make a difference. By becoming a Let's Help Leader, you've joined a community of volunteers committed to creating awareness, encouraging blood donation, and helping save lives.</p>");
-                    sbDesign.Append("<div style='background-color: #fff5f5; border-left: 4px solid #e53e3e; padding: 14px 18px; border-radius: 6px; margin: 20px 0;'>");
-                    sbDesign.Append("<p style='margin: 0 0 8px 0; font-weight: bold; color: #9b2c2c;'>As a Leader, you can:</p>");
-                    sbDesign.Append("<ul style='margin: 0; padding-left: 20px; color: #4a5568;'>");
-                    sbDesign.Append("<li style='margin-bottom: 6px;'>Register blood donors who may not be able to use the app themselves.</li>");
-                    sbDesign.Append("<li style='margin-bottom: 6px;'>Organize blood donation awareness presentations in schools, colleges, and communities.</li>");
-                    sbDesign.Append("<li style='margin-bottom: 6px;'>Guide and inspire others to become regular blood donors.</li>");
-                    sbDesign.Append("<li style='margin-bottom: 6px;'>Spread awareness using our official brochures, banners, and social media materials.</li>");
-                    sbDesign.Append("<li>Help build a stronger and more connected donor network in your community.</li>");
-                    sbDesign.Append("</ul></div>");
+                    
+                    sbDesign.Append("<div style='background-color: #fff5f5; border-left: 4px solid #e53e3e; padding: 18px 22px; border-radius: 8px; margin: 24px 0;'>");
+                    sbDesign.Append("<p style='margin: 0 0 10px 0; font-weight: bold; color: #9b2c2c; font-size: 16px;'>As a Leader, you can:</p>");
+                    sbDesign.Append("<ul style='margin: 0 0 18px 0; padding-left: 20px; color: #4a5568; line-height: 1.6;'>");
+                    sbDesign.Append("<li style='margin-bottom: 8px;'>Register blood donors who may not be able to use the app themselves.</li>");
+                    sbDesign.Append("<li style='margin-bottom: 8px;'>Organize blood donation awareness presentations in schools, colleges, and communities.</li>");
+                    sbDesign.Append("<li style='margin-bottom: 8px;'>Guide and inspire others to become regular blood donors.</li>");
+                    sbDesign.Append("<li style='margin-bottom: 8px;'>Spread awareness using our official brochures, banners, and social media materials.</li>");
+                    sbDesign.Append("<li style='margin-bottom: 0;'>Help build a stronger and more connected donor network in your community.</li>");
+                    sbDesign.Append("</ul>");
+
+                    sbDesign.Append("<p style='margin: 18px 0 10px 0; font-weight: bold; color: #1a202c; font-size: 15px; border-top: 1px solid #fed7d7; padding-top: 14px;'>To help you get started, we've attached the following:</p>");
+                    sbDesign.Append("<p style='margin: 8px 0; color: #2d3748;'>📌 <b>Leader ID Card</b> – Your official Let's Help Leader identification.</p>");
+                    sbDesign.Append("<p style='margin: 8px 0; color: #2d3748;'>📘 <b>Leader Guide</b> – Everything you need to know about your role, responsibilities, and the Leader features available in the app.</p>");
+                    sbDesign.Append("<p style='margin: 8px 0 0 0; color: #2d3748;'>🖼️ <b>Awareness Card</b> – A ready-to-share digital card that you can share with your family, friends, colleagues, and social networks to inspire more people to join our mission.</p>");
+                    sbDesign.Append("</div>");
                 }
 
                 if (isDonor)
@@ -1023,7 +1278,14 @@ namespace BloodGroupApi.Models
                     sbDesign.Append("<p>Thank you once again for becoming a Let's Help Leader. We look forward to seeing the positive impact you'll create.</p>");
                 }
 
-                sbDesign.Append("<p style='font-size: 13px; color: #718096; margin-top: 20px;'><i>(Please find your official Welcome Membership Card attached to this email.)</i></p>");
+                if (isLeader)
+                {
+                    sbDesign.Append("<p style='font-size: 13px; color: #718096; margin-top: 20px;'><i>(Please find your official Welcome Membership Card, Leader ID Cards, and Leader Guide attached to this email.)</i></p>");
+                }
+                else
+                {
+                    sbDesign.Append("<p style='font-size: 13px; color: #718096; margin-top: 20px;'><i>(Please find your official Welcome Membership Card attached to this email.)</i></p>");
+                }
 
                 // Sign-off
                 sbDesign.Append("<div style='margin-top: 25px; padding-top: 18px; border-top: 1px solid #edf2f7;'>");
@@ -1037,7 +1299,7 @@ namespace BloodGroupApi.Models
                 sbDesign.Append("</td></tr>");
 
                 // Footer
-                sbDesign.Append("<tr><td style='background-color: #f7fafc; padding: 16px 25px; text-align: center; border-top: 1px solid #edf2f7; font-size: 12px; color: #a0aec0;'>");
+                sbDesign.Append("<tr><td style='background-color: #f7fafc; padding: 20px 35px; text-align: center; border-top: 1px solid #edf2f7; font-size: 12px; color: #a0aec0;'>");
                 sbDesign.Append("<p style='margin: 0;'>© " + DateTime.Now.Year + " Let's Help Foundation. All rights reserved.</p>");
                 sbDesign.Append("<p style='margin: 4px 0 0 0;'>Website: <a href='https://letshelp.in' style='color: #e53e3e; text-decoration: none;'>letshelp.in</a></p>");
                 sbDesign.Append("</td></tr>");
@@ -1072,11 +1334,70 @@ namespace BloodGroupApi.Models
                 mail.Body = sbDesign.ToString();
                 mail.BodyEncoding = Encoding.UTF8;
 
+                // 1. Attach Welcome Card
                 if (imageBytes != null && imageBytes.Length > 0)
                 {
-                    // Add only as downloadable attachment
                     MemoryStream msAttachment = new MemoryStream(imageBytes);
                     mail.Attachments.Add(new Attachment(msAttachment, "Welcome_Card.png", "image/png"));
+                    SafeLogEmail($"[{DateTime.Now}] Attached Welcome_Card.png ({imageBytes.Length} bytes).\n");
+                }
+
+                // 2. If Leader (roleId == "4"), generate and attach Leader ID Cards (Front and Back)
+                if (isLeader)
+                {
+                    SafeLogEmail($"[{DateTime.Now}] Generating Leader ID Cards for Leader role...\n");
+                    string cardFullName = !string.IsNullOrWhiteSpace(fullName) ? fullName : firstName;
+                    string cardTitle = !string.IsNullOrWhiteSpace(title) ? title : "Community Leader";
+                    string cardBloodGroup = !string.IsNullOrWhiteSpace(bloodGroup) ? bloodGroup : "-";
+                    string cardPhone = !string.IsNullOrWhiteSpace(phoneNumber) ? phoneNumber : "-";
+
+                    byte[] frontBytes = GenerateLeaderIDCardFront(cardFullName, cardMemberId, cardTitle, cardBloodGroup, email, cardPhone);
+                    if (frontBytes != null && frontBytes.Length > 0)
+                    {
+                        MemoryStream msFront = new MemoryStream(frontBytes);
+                        mail.Attachments.Add(new Attachment(msFront, "Leader_ID_Card_Front.png", "image/png"));
+                        SafeLogEmail($"[{DateTime.Now}] Successfully generated and attached Leader_ID_Card_Front.png ({frontBytes.Length} bytes).\n");
+                    }
+                    else
+                    {
+                        SafeLogEmail($"[{DateTime.Now}] WARNING: GenerateLeaderIDCardFront returned null or empty.\n");
+                    }
+
+                    byte[] backBytes = GenerateLeaderIDCardBack();
+                    if (backBytes != null && backBytes.Length > 0)
+                    {
+                        MemoryStream msBack = new MemoryStream(backBytes);
+                        mail.Attachments.Add(new Attachment(msBack, "Leader_ID_Card_Back.png", "image/png"));
+                        SafeLogEmail($"[{DateTime.Now}] Successfully generated and attached Leader_ID_Card_Back.png ({backBytes.Length} bytes).\n");
+                    }
+                    else
+                    {
+                        SafeLogEmail($"[{DateTime.Now}] WARNING: GenerateLeaderIDCardBack returned null or empty.\n");
+                    }
+
+                    // Attach LeaderGuide.pdf
+                    try
+                    {
+                        string leaderGuidePath = GetAssetFilePath("LeaderGuide.pdf");
+                        if (!string.IsNullOrEmpty(leaderGuidePath) && File.Exists(leaderGuidePath))
+                        {
+                            byte[] pdfBytes = File.ReadAllBytes(leaderGuidePath);
+                            if (pdfBytes != null && pdfBytes.Length > 0)
+                            {
+                                MemoryStream msPdf = new MemoryStream(pdfBytes);
+                                mail.Attachments.Add(new Attachment(msPdf, "LeaderGuide.pdf", "application/pdf"));
+                                SafeLogEmail($"[{DateTime.Now}] Successfully attached LeaderGuide.pdf ({pdfBytes.Length} bytes).\n");
+                            }
+                        }
+                        else
+                        {
+                            SafeLogEmail($"[{DateTime.Now}] WARNING: LeaderGuide.pdf file not found.\n");
+                        }
+                    }
+                    catch (Exception exPdf)
+                    {
+                        SafeLogEmail($"[{DateTime.Now}] ERROR attaching LeaderGuide.pdf: {exPdf.Message}\n");
+                    }
                 }
 
                 SafeLogEmail($"[{DateTime.Now}] Configuring SmtpClient...\n");

@@ -438,8 +438,21 @@ namespace BloodGroupApi.Controllers
                 var roleId = System.Web.HttpContext.Current.Request.Form["RoleId"];
                 var memberId = System.Web.HttpContext.Current.Request.Form["MemberId"];
                 var regId = System.Web.HttpContext.Current.Request.Form["RegId"];
+                var fullName = System.Web.HttpContext.Current.Request.Form["FullName"];
+                var bloodGroup = System.Web.HttpContext.Current.Request.Form["BloodGroup"];
+                var phoneNumber = System.Web.HttpContext.Current.Request.Form["PhoneNumber"];
+                var title = System.Web.HttpContext.Current.Request.Form["Title"];
+                var referralCode = System.Web.HttpContext.Current.Request.Form["ReferralCode"];
+                if (string.IsNullOrWhiteSpace(referralCode))
+                {
+                    referralCode = System.Web.HttpContext.Current.Request.Form["ReferenceCode"];
+                }
+                if (string.IsNullOrWhiteSpace(referralCode))
+                {
+                    referralCode = System.Web.HttpContext.Current.Request.Form["Reffercode"];
+                }
 
-                var data = mail.SendLeaderWelcomeEmail(email, firstName, base64Image, roleId, memberId, regId);
+                var data = mail.SendLeaderWelcomeEmail(email, firstName, base64Image, roleId, memberId, regId, fullName, bloodGroup, phoneNumber, title, referralCode);
                 return data;
             }
             catch (Exception ex)
