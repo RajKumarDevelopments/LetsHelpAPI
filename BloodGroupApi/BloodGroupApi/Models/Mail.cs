@@ -976,7 +976,7 @@ namespace BloodGroupApi.Models
             }
         }
 
-        public byte[] GenerateLeaderIDCardFront(string fullName, string memberId, string title, string bloodGroup, string email, string phoneNo)
+        public byte[] GenerateLeaderIDCardFront(string fullName, string memberId, string title, string bloodGroup, string email, string phoneNo, string middleName = "", string surName = "", string firstName = "")
         {
             try
             {
@@ -1023,8 +1023,18 @@ namespace BloodGroupApi.Models
                                 }
                             }
 
-                            // Draw Full Name (Centered)
-                            string displayName = string.IsNullOrWhiteSpace(fullName) ? "Leader Member" : fullName.Trim();
+                            // Draw Full Name (Centered - Format: FirstName MiddleName SurName)
+                            List<string> nameParts = new List<string>();
+                            if (!string.IsNullOrWhiteSpace(firstName)) nameParts.Add(firstName.Trim());
+                            if (!string.IsNullOrWhiteSpace(middleName)) nameParts.Add(middleName.Trim());
+                            if (!string.IsNullOrWhiteSpace(surName)) nameParts.Add(surName.Trim());
+
+                            string displayName = string.Join(" ", nameParts);
+                            if (string.IsNullOrWhiteSpace(displayName))
+                            {
+                                displayName = string.IsNullOrWhiteSpace(fullName) ? "Leader Member" : fullName.Trim();
+                            }
+
                             float nameFontSize = 90f;
                             using (System.Drawing.Brush nameBrush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(25, 25, 25)))
                             {
@@ -1056,8 +1066,9 @@ namespace BloodGroupApi.Models
                             }
 
                             float valX = 835f;
+                            float detailsFontSize = 58f;
                             using (System.Drawing.Brush valBrush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(35, 35, 35)))
-                            using (System.Drawing.Font valFont = new System.Drawing.Font(detailsFamily, 52f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel))
+                            using (System.Drawing.Font valFont = new System.Drawing.Font(detailsFamily, detailsFontSize, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel))
                             {
                                 // USER ID
                                 string displayUserId = string.IsNullOrWhiteSpace(memberId) ? "LHF000123" : memberId.Trim();
@@ -1076,10 +1087,10 @@ namespace BloodGroupApi.Models
                                 System.Drawing.SizeF emailSize = g.MeasureString(displayEmail, valFont);
                                 if (emailSize.Width > 1050f)
                                 {
-                                    float emailFontSize = 52f * (1050f / emailSize.Width);
+                                    float emailFontSize = detailsFontSize * (1050f / emailSize.Width);
                                     using (System.Drawing.Font emailFont = new System.Drawing.Font(detailsFamily, emailFontSize, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel))
                                     {
-                                        g.DrawString(displayEmail, emailFont, valBrush, valX, 2085f + (52f - emailFontSize) / 2f);
+                                        g.DrawString(displayEmail, emailFont, valBrush, valX, 2085f + (detailsFontSize - emailFontSize) / 2f);
                                     }
                                 }
                                 else
@@ -1164,7 +1175,7 @@ namespace BloodGroupApi.Models
             }
         }
 
-        public string SendLeaderWelcomeEmail(string email, string firstName, string base64Image, string roleId = "4", string memberId = "", string regId = "", string fullName = "", string bloodGroup = "", string phoneNumber = "", string title = "", string referralCode = "")
+        public string SendLeaderWelcomeEmail(string email, string firstName, string base64Image, string roleId = "4", string memberId = "", string regId = "", string fullName = "", string bloodGroup = "", string phoneNumber = "", string title = "", string referralCode = "", string middleName = "", string surName = "")
         {
             try
             {
@@ -1346,12 +1357,30 @@ namespace BloodGroupApi.Models
                 if (isLeader)
                 {
                     SafeLogEmail($"[{DateTime.Now}] Generating Leader ID Cards for Leader role...\n");
-                    string cardFullName = !string.IsNullOrWhiteSpace(fullName) ? fullName : firstName;
+                    List<string> cardNameParts = new List<string>();
+                    if (!string.IsNullOrWhiteSpace(firstName)) cardNameParts.Add(firstName.Trim());
+                    if (!string.IsNullOrWhiteSpace(middleName)) cardNameParts.Add(middleName.Trim());
+                    if (!string.IsNullOrWhiteSpace(surName)) cardNameParts.Add(surName.Trim());
+
+                    string cardFullName;
+                    if (cardNameParts.Count > 0)
+                    {
+                        cardFullName = string.Join(" ", cardNameParts);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(fullName))
+                    {
+                        cardFullName = fullName.Trim();
+                    }
+                    else
+                    {
+                        cardFullName = "Leader Member";
+                    }
+
                     string cardTitle = !string.IsNullOrWhiteSpace(title) ? title : "Community Leader";
                     string cardBloodGroup = !string.IsNullOrWhiteSpace(bloodGroup) ? bloodGroup : "-";
                     string cardPhone = !string.IsNullOrWhiteSpace(phoneNumber) ? phoneNumber : "-";
 
-                    byte[] frontBytes = GenerateLeaderIDCardFront(cardFullName, cardMemberId, cardTitle, cardBloodGroup, email, cardPhone);
+                    byte[] frontBytes = GenerateLeaderIDCardFront(cardFullName, cardMemberId, cardTitle, cardBloodGroup, email, cardPhone, middleName, surName, firstName);
                     if (frontBytes != null && frontBytes.Length > 0)
                     {
                         MemoryStream msFront = new MemoryStream(frontBytes);

@@ -434,6 +434,16 @@ namespace BloodGroupApi.Controllers
             {
                 var email = System.Web.HttpContext.Current.Request.Form["Email"];
                 var firstName = System.Web.HttpContext.Current.Request.Form["FirstName"];
+                var middleName = System.Web.HttpContext.Current.Request.Form["MiddleName"];
+                var surName = System.Web.HttpContext.Current.Request.Form["SurName"];
+                if (string.IsNullOrWhiteSpace(surName))
+                {
+                    surName = System.Web.HttpContext.Current.Request.Form["Surname"];
+                }
+                if (string.IsNullOrWhiteSpace(surName))
+                {
+                    surName = System.Web.HttpContext.Current.Request.Form["LastName"];
+                }
                 var base64Image = System.Web.HttpContext.Current.Request.Form["Base64Image"];
                 var roleId = System.Web.HttpContext.Current.Request.Form["RoleId"];
                 var memberId = System.Web.HttpContext.Current.Request.Form["MemberId"];
@@ -452,7 +462,7 @@ namespace BloodGroupApi.Controllers
                     referralCode = System.Web.HttpContext.Current.Request.Form["Reffercode"];
                 }
 
-                var data = mail.SendLeaderWelcomeEmail(email, firstName, base64Image, roleId, memberId, regId, fullName, bloodGroup, phoneNumber, title, referralCode);
+                var data = mail.SendLeaderWelcomeEmail(email, firstName, base64Image, roleId, memberId, regId, fullName, bloodGroup, phoneNumber, title, referralCode, middleName, surName);
                 return data;
             }
             catch (Exception ex)
