@@ -436,14 +436,17 @@ namespace BloodGroupApi.Controllers
                 var firstName = System.Web.HttpContext.Current.Request.Form["FirstName"];
                 var middleName = System.Web.HttpContext.Current.Request.Form["MiddleName"];
                 var surName = System.Web.HttpContext.Current.Request.Form["SurName"];
+
                 if (string.IsNullOrWhiteSpace(surName))
                 {
                     surName = System.Web.HttpContext.Current.Request.Form["Surname"];
                 }
+
                 if (string.IsNullOrWhiteSpace(surName))
                 {
                     surName = System.Web.HttpContext.Current.Request.Form["LastName"];
                 }
+
                 var base64Image = System.Web.HttpContext.Current.Request.Form["Base64Image"];
                 var roleId = System.Web.HttpContext.Current.Request.Form["RoleId"];
                 var memberId = System.Web.HttpContext.Current.Request.Form["MemberId"];
@@ -453,23 +456,92 @@ namespace BloodGroupApi.Controllers
                 var phoneNumber = System.Web.HttpContext.Current.Request.Form["PhoneNumber"];
                 var title = System.Web.HttpContext.Current.Request.Form["Title"];
                 var referralCode = System.Web.HttpContext.Current.Request.Form["ReferralCode"];
+
                 if (string.IsNullOrWhiteSpace(referralCode))
                 {
                     referralCode = System.Web.HttpContext.Current.Request.Form["ReferenceCode"];
                 }
+
                 if (string.IsNullOrWhiteSpace(referralCode))
                 {
                     referralCode = System.Web.HttpContext.Current.Request.Form["Reffercode"];
                 }
 
-                var data = mail.SendLeaderWelcomeEmail(email, firstName, base64Image, roleId, memberId, regId, fullName, bloodGroup, phoneNumber, title, referralCode, middleName, surName);
+                string savedImagePath;
+
+                var data = mail.SendLeaderWelcomeEmail( email, firstName, base64Image, out savedImagePath, roleId,  memberId,  regId, fullName, bloodGroup, phoneNumber, title, referralCode, middleName,surName );
+
+                if (data == "SUCCESS" && !string.IsNullOrEmpty(savedImagePath))
+                {
+                    try
+                    {
+                        var gList = new List<MyDonationrequest>();
+
+                        int parsedRegId;
+                        int parsedRoleId;
+
+                        if (!int.TryParse(regId, out parsedRegId))
+                        {
+                            return "Invalid RegId";
+                        }
+
+                        if (!int.TryParse(roleId, out parsedRoleId))
+                        {
+                            return "Invalid RoleId";
+                        }
+
+                        var g = new MyDonationrequest
+                        {
+                            GalleryImages = savedImagePath,
+
+                            RegId = parsedRegId,
+                            RoleId = parsedRoleId,
+
+                            Status = true,
+                            WelcomeStatus = 1,
+
+                            CreatedDate = DateTime.Now,
+                            CreatedBy = parsedRegId
+                        };
+
+                        gList.Add(g);
+
+                        var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(gList);
+
+                        // Save welcome card into Gallery table
+                        var result = BL.UploadBloodDonationImagemobile(jsonData, "1");
+
+                        // Return SUCCESS only when Gallery save is successful
+                        if (result != null &&
+                            result.ToString().Equals(
+                                "SUCCESS",
+                                StringComparison.OrdinalIgnoreCase))
+                        {
+                            return "SUCCESS";
+                        }
+
+                        return result;
+                    }
+                    catch (Exception ex)
+                    {
+                        BL.saveExceptions(
+                            ex.Message + ex.StackTrace,
+                            "0",
+                            "Webapi"
+                        );
+
+                        throw;
+                    }
+                }
+
+                // If email/card generation was not successful
                 return data;
             }
             catch (Exception ex)
             {
                 exp.ExceptionHandler(ex);
-                BL.saveExceptions((ex.Message + ex.StackTrace).ToString(), "1", "Webapi");
-                throw ex;
+                BL.saveExceptions(ex.Message + ex.StackTrace,"1", "Webapi");
+                throw;
             }
         }
         #endregion
@@ -2475,8 +2547,9 @@ namespace BloodGroupApi.Controllers
         {
             try
             {
-                var param = System.Web.HttpContext.Current.Request["Param"];
-                var data = BL.Get_Notification_basedon_UserId(param);
+                var Param1 = System.Web.HttpContext.Current.Request["Param1"];
+                var Param2 = System.Web.HttpContext.Current.Request["Param2"];
+                var data = BL.Get_Notification_basedon_UserId(Param1, Param2);
                 return data;
             }
             catch (Exception ex)

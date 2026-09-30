@@ -1175,8 +1175,9 @@ namespace BloodGroupApi.Models
             }
         }
 
-        public string SendLeaderWelcomeEmail(string email, string firstName, string base64Image, string roleId = "4", string memberId = "", string regId = "", string fullName = "", string bloodGroup = "", string phoneNumber = "", string title = "", string referralCode = "", string middleName = "", string surName = "")
+        public string SendLeaderWelcomeEmail(string email, string firstName, string base64Image, out string savedImagePath, string roleId = "4", string memberId = "", string regId = "", string fullName = "", string bloodGroup = "", string phoneNumber = "", string title = "", string referralCode = "", string middleName = "", string surName = "")
         {
+            savedImagePath = null;
             try
             {
                 SafeLogEmail($"\n[{DateTime.Now}] Starting SendLeaderWelcomeEmail for {email} (RoleId: {roleId}, MemberId: {memberId}, ReferralCode: {referralCode})...\n");
@@ -1425,7 +1426,40 @@ namespace BloodGroupApi.Models
                     }
                     catch (Exception exPdf)
                     {
-                        SafeLogEmail($"[{DateTime.Now}] ERROR attaching LeaderGuide.pdf: {exPdf.Message}\n");
+                        SafeLogEmail($"[{DateTime.Now}] LeaderGuide.pdf file not found: {exPdf.Message}\n");
+                    }
+
+                }
+
+                // 3. If Donor (roleId == "2"), attach APPGuide.pdf
+                if (isDonor)
+                {
+                    try
+                    {
+                        string appGuidePath = GetAssetFilePath("APPGuide.pdf");
+                        if (string.IsNullOrEmpty(appGuidePath) || !File.Exists(appGuidePath))
+                        {
+                            appGuidePath = GetAssetFilePath("APPGuide");
+                        }
+
+                        if (!string.IsNullOrEmpty(appGuidePath) && File.Exists(appGuidePath))
+                        {
+                            byte[] pdfBytes = File.ReadAllBytes(appGuidePath);
+                            if (pdfBytes != null && pdfBytes.Length > 0)
+                            {
+                                MemoryStream msPdf = new MemoryStream(pdfBytes);
+                                mail.Attachments.Add(new Attachment(msPdf, "APPGuide.pdf", "application/pdf"));
+                                SafeLogEmail($"[{DateTime.Now}] Successfully attached APPGuide.pdf ({pdfBytes.Length} bytes).\n");
+                            }
+                        }
+                        else
+                        {
+                            SafeLogEmail($"[{DateTime.Now}] WARNING: APPGuide.pdf file not found.\n");
+                        }
+                    }
+                    catch (Exception exPdf)
+                    {
+                        SafeLogEmail($"[{DateTime.Now}] ERROR attaching APPGuide.pdf: {exPdf.Message}\n");
                     }
                 }
 
@@ -1440,6 +1474,54 @@ namespace BloodGroupApi.Models
                 SafeLogEmail($"[{DateTime.Now}] Attempting to send email via SMTP...\n");
                 smtp.Send(mail);
                 SafeLogEmail($"[{DateTime.Now}] Email sent successfully via SMTP!\n");
+
+                if (imageBytes != null && imageBytes.Length > 0)
+                {
+                    try
+                    {
+                        // 1. Determine directory path for WelcomeTemplate
+                        string folderPath = null;
+                        if (HttpContext.Current != null && HttpContext.Current.Server != null)
+                        {
+                            folderPath = HttpContext.Current.Server.MapPath("~/Image/WelcomeTemplate/");
+                        }
+                        else if (System.Web.Hosting.HostingEnvironment.IsHosted)
+                        {
+                            folderPath = System.Web.Hosting.HostingEnvironment.MapPath("~/Image/WelcomeTemplate/");
+                        }
+
+                        if (string.IsNullOrEmpty(folderPath))
+                        {
+                            folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Image", "WelcomeTemplate");
+                        }
+
+                        if (!Directory.Exists(folderPath))
+                        {
+                            Directory.CreateDirectory(folderPath);
+                        }
+
+                        // 2. Generate unique filename (using memberId/regId + timestamp)
+                        string idForFile = !string.IsNullOrWhiteSpace(cardMemberId) ? cardMemberId.Trim() : (!string.IsNullOrWhiteSpace(regId) ? regId.Trim() : "user");
+                        foreach (char c in Path.GetInvalidFileNameChars())
+                        {
+                            idForFile = idForFile.Replace(c, '_');
+                        }
+
+                        string fileName = $"WelcomeCard_{idForFile}_{DateTime.Now:yyyyMMdd_HHmmssfff}.png";
+                        string fullSavePath = Path.Combine(folderPath, fileName);
+
+                        // 3. Save physical file to disk in .png format
+                        File.WriteAllBytes(fullSavePath, imageBytes);
+                        SafeLogEmail($"[{DateTime.Now}] Welcome template card image saved to {fullSavePath}\n");
+
+                        // 4. Return relative path for database storage and future access
+                        savedImagePath = "Image/WelcomeTemplate/" + fileName;
+                    }
+                    catch (Exception exSave)
+                    {
+                        SafeLogEmail($"[{DateTime.Now}] WARNING: Failed to save welcome template card image file: {exSave.Message}\n{exSave.StackTrace}\n");
+                    }
+                }
 
                 return "SUCCESS";
             }

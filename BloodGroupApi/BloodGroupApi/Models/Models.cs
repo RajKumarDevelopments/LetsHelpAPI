@@ -5,6 +5,7 @@ using System.Web;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.ComponentModel.DataAnnotations;
+using Google.Rpc;
 
 namespace BloodGroupApi.Models
 
@@ -646,6 +647,7 @@ namespace BloodGroupApi.Models
             public string HospitalAddress { get; set; }
             public string Typesofblood { get; set; }
             public string HospitalPhonenumber { get; set; }
+            public Boolean? WelcomeStatus { get; set; }
 
 
 
@@ -953,6 +955,8 @@ namespace BloodGroupApi.Models
 
             public DateTime? CreatedDate { get; set; }
             public Int32? SYSSubmitted { get; set; }
+            public Boolean? Status { get; set; } 
+            public Int32? WelcomeStatus { get; set; }
         }
 
         public class report
@@ -1463,6 +1467,7 @@ namespace BloodGroupApi.Models
             public string RegCity { get; set; }
             public string RegPin { get; set; }
             public string RegArea { get; set; }
+            public string DeviceToken { get; set; }
 
         }
 
@@ -1505,6 +1510,7 @@ namespace BloodGroupApi.Models
             public string Pincode { get; set; }
             public int? Count { get; set; }
             public DateTime? CreatedDate { get; set; }
+            public string DeviceToken { get; set; }
 
 
         }

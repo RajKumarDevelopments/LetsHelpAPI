@@ -1181,92 +1181,101 @@ namespace BloodGroupApi.Models
                 List<Doners> Data1 = new JavaScriptSerializer().Deserialize<List<Doners>>(xmlParam);
                 string XML = XMLConvert.GetXmlArrayString<Doners>(Data1);
                 ds = db.SaveDataReturn1(SPS.Register_User_Curd.ToString(), XML, flag);
-                MSG = ds.Tables[0].Rows[0][0].ToString();
-                var checkdata = db.CheckDatainDS(ds, 0);
-                if (checkdata == true)
+                if (ds == null || ds.Tables.Count == 0)
                 {
-                    if (flag == "1" || flag == "2" || flag == "3")
-                    {
-                        MSG = db.GetMessage(ds);
-                        return MSG;
-                    }
-                    else if (flag == "4")
-                    {
-                        Data1 = ds.Tables[0].AsEnumerable().Select(
-                            A => new Doners()
-                            {
-                                RegId = A.Field<int?>("RegId") ?? 0,
-                                RoleId = A.Field<int?>("RoleId") ?? 0,
-                                Devicetoken = A.Field<string>("Devicetoken") ?? "",
-                                FullName = A.Field<string>("FullName") ?? "",
-                                //Pincode = A.Field<string>("Pincode") ?? "",
+                    return new List<Doners>();
+                }
 
-                                Phonenumber = A.Field<string>("Phonenumber") + "",
-                                Password = A.Field<string>("Password") + "",
-                                Email = A.Field<string>("Email") + "",
-                                Age = A.Field<string>("Age") + "",
-                                Gender = A.Field<string>("Gender") + "",
-                                TokenId = A.Field<Guid?>("TokenId")?.ToString() ?? "",
-                                Rolestatus = A.Field<bool?>("Rolestatus")
-                            }).ToList();
-                        return Data1;
+                if (flag == "1" || flag == "2" || flag == "3")
+                {
+                    if (ds.Tables[0].Rows.Count > 0)
+                    {
+                        MSG = ds.Tables[0].Rows[0][0].ToString();
                     }
 
-                    else if (flag == "6")
-                    {
-                        Data1 = ds.Tables[0].AsEnumerable().Select(
-                            A => new Doners()
-                            {
-                                RegId = A.Field<int?>("RegId") ?? 0,
-                                RoleId = A.Field<int?>("RoleId") ?? 0,
-                                Devicetoken = A.Field<string>("Devicetoken") ?? "",
-                                FullName = A.Field<string>("FullName") ?? "",
-                                Pincode = A.Field<string>("Pincode") ?? "",
+                    MSG = db.GetMessage(ds);
+                    return MSG;
+                }
 
-                                Phonenumber = A.Field<string>("Phonenumber") + "",
-                                Password = A.Field<string>("Password") + "",
-                                Email = A.Field<string>("Email") + "",
-                                Age = A.Field<string>("Age") + "",
-                                Gender = A.Field<string>("Gender") + "",
-                                TokenId = A.Field<Guid?>("TokenId")?.ToString() ?? "",
-                                Rolestatus = A.Field<bool?>("Rolestatus")
-                            }).ToList();
-                        return Data1;
-                    }
-                    else if (flag == "5")
-                    {
-                        Data1 = ds.Tables[0].AsEnumerable().Select(A => new Doners()
+                if (flag == "4")
+                {
+                    if (ds.Tables[0].Rows.Count == 0)
+                        return new List<Doners>();
+
+                    Data1 = ds.Tables[0].AsEnumerable().Select(
+                        A => new Doners()
                         {
                             RegId = A.Field<int?>("RegId") ?? 0,
+                            RoleId = A.Field<int?>("RoleId") ?? 0,
                             Devicetoken = A.Field<string>("Devicetoken") ?? "",
                             FullName = A.Field<string>("FullName") ?? "",
-                            ContactMobile = A.Field<string>("ContactMobile") ?? "",
                             Phonenumber = A.Field<string>("Phonenumber") ?? "",
-                            HospitalAddress = A.Field<string>("HospitalAddress") + "",
-                            UserAddress = A.Field<string>("UserAddress") + "",
-                            HospitalName = A.Field<string>("HospitalName") + "",
-                            newStatename = A.Field<string>("newStatename") + "",
-                            newDistrictname = A.Field<string>("newDistrictname") + "",
-
-                            Area = A.Field<string>("Area") + "",
-                            //DistrictName = A.Field<string>("DistrictName") + "",
-                            //CityName = A.Field<string>("CityName") + "",
-                            CreatedDate = A.Field<DateTime?>("CreatedDate") ?? null,
-                            Email = A.Field<string>("Email") + "",
-                            Age = A.Field<string>("Age") + "",
-                            Gender = A.Field<string>("Gender") + "",
-                            newCityname = A.Field<string>("newCityname") + "",
-                            Pincode = A.Field<string>("Pincode") + "",
+                            Password = A.Field<string>("Password") ?? "",
+                            Email = A.Field<string>("Email") ?? "",
+                            Age = A.Field<string>("Age") ?? "",
+                            Gender = A.Field<string>("Gender") ?? "",
                             TokenId = A.Field<Guid?>("TokenId")?.ToString() ?? "",
                             Rolestatus = A.Field<bool?>("Rolestatus")
                         }).ToList();
-                        return Data1;
-                    }
 
-
-
+                    return Data1;
                 }
 
+                if (flag == "6")
+                {
+                    if (ds.Tables[0].Rows.Count == 0)
+                        return new List<Doners>();
+
+                    Data1 = ds.Tables[0].AsEnumerable().Select(
+                        A => new Doners()
+                        {
+                            RegId = A.Field<int?>("RegId") ?? 0,
+                            RoleId = A.Field<int?>("RoleId") ?? 0,
+                            Devicetoken = A.Field<string>("Devicetoken") ?? "",
+                            FullName = A.Field<string>("FullName") ?? "",
+                            Pincode = A.Field<string>("Pincode") ?? "",
+                            Phonenumber = A.Field<string>("Phonenumber") ?? "",
+                            Password = A.Field<string>("Password") ?? "",
+                            Email = A.Field<string>("Email") ?? "",
+                            Age = A.Field<string>("Age") ?? "",
+                            Gender = A.Field<string>("Gender") ?? "",
+                            TokenId = A.Field<Guid?>("TokenId")?.ToString() ?? "",
+                            Rolestatus = A.Field<bool?>("Rolestatus")
+                        }).ToList();
+
+                    return Data1;
+                }
+
+                if (flag == "5")
+                {
+                    if (ds.Tables[0].Rows.Count == 0)
+                        return new List<Doners>();
+
+                    Data1 = ds.Tables[0].AsEnumerable().Select(A => new Doners()
+                    {
+                        RegId = A.Field<int?>("RegId") ?? 0,
+                        Devicetoken = A.Field<string>("Devicetoken") ?? "",
+                        FullName = A.Field<string>("FullName") ?? "",
+                        ContactMobile = A.Field<string>("ContactMobile") ?? "",
+                        Phonenumber = A.Field<string>("Phonenumber") ?? "",
+                        HospitalAddress = A.Field<string>("HospitalAddress") ?? "",
+                        UserAddress = A.Field<string>("UserAddress") ?? "",
+                        HospitalName = A.Field<string>("HospitalName") ?? "",
+                        newStatename = A.Field<string>("newStatename") ?? "",
+                        newDistrictname = A.Field<string>("newDistrictname") ?? "",
+                        Area = A.Field<string>("Area") ?? "",
+                        CreatedDate = A.Field<DateTime?>("CreatedDate"),
+                        Email = A.Field<string>("Email") ?? "",
+                        Age = A.Field<string>("Age") ?? "",
+                        Gender = A.Field<string>("Gender") ?? "",
+                        newCityname = A.Field<string>("newCityname") ?? "",
+                        Pincode = A.Field<string>("Pincode") ?? "",
+                        TokenId = A.Field<Guid?>("TokenId")?.ToString() ?? "",
+                        Rolestatus = A.Field<bool?>("Rolestatus")
+                    }).ToList();
+
+                    return Data1;
+                }
                 ds.Clear();
                 return MSG;
             }
@@ -3519,15 +3528,53 @@ namespace BloodGroupApi.Models
         #endregion
 
         #region Upload Blood Donation Image by Donor    -- suraj
+        //public dynamic UploadBloodDonationImagemobile(string xml, string flag)
+        //{
+        //    try
+        //    {
+        //        var MSG = "";
+        //        List<MyDonationrequest> userdata = new JavaScriptSerializer().Deserialize<List<MyDonationrequest>>(xml);
+        //        var data = XMLConvert.GetXmlArrayString<MyDonationrequest>(userdata);
+        //        ds = db.SaveDataReturn1(SPS.BG_Upload_BloodDonationImage_mobile.ToString(), data, flag);
+        //        var checkdata = db.CheckDatainDS(ds, 0);
+        //        if (checkdata == true)
+        //        {
+        //            if (flag == "1")
+        //            {
+        //                MSG = db.GetMessage(ds);
+        //                return MSG;
+        //            }
+        //        }
+        //        return MSG;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        saveExceptions((ex.Message + ex.StackTrace).ToString(), "0", "Webapi");
+        //        exp.ExceptionHandler(ex);
+        //        throw ex;
+        //    }
+        //}
         public dynamic UploadBloodDonationImagemobile(string xml, string flag)
         {
             try
             {
                 var MSG = "";
-                List<MyDonationrequest> userdata = new JavaScriptSerializer().Deserialize<List<MyDonationrequest>>(xml);
-                var data = XMLConvert.GetXmlArrayString<MyDonationrequest>(userdata);
-                ds = db.SaveDataReturn1(SPS.BG_Upload_BloodDonationImage_mobile.ToString(), data, flag);
+
+                List<MyDonationrequest> userdata =
+                    new JavaScriptSerializer()
+                    .Deserialize<List<MyDonationrequest>>(xml);
+
+                var data =
+                    XMLConvert.GetXmlArrayString<MyDonationrequest>(userdata);
+
+                ds = db.SaveDataReturn1(
+                    SPS.BG_Upload_BloodDonationImage_mobile.ToString(),
+                    data,
+                    flag
+                );
+
                 var checkdata = db.CheckDatainDS(ds, 0);
+
                 if (checkdata == true)
                 {
                     if (flag == "1")
@@ -3536,13 +3583,19 @@ namespace BloodGroupApi.Models
                         return MSG;
                     }
                 }
+
                 return MSG;
             }
             catch (Exception ex)
             {
-                saveExceptions((ex.Message + ex.StackTrace).ToString(), "0", "Webapi");
+                saveExceptions(
+                    (ex.Message + ex.StackTrace).ToString(),
+                    "0",
+                    "Webapi"
+                );
+
                 exp.ExceptionHandler(ex);
-                throw ex;
+                throw;
             }
         }
         #endregion
@@ -4255,43 +4308,68 @@ namespace BloodGroupApi.Models
             }
         }
 
-        #region Get_Notification_basedon_UserId -- manohar
-        public dynamic Get_Notification_basedon_UserId(string param)
+        #region Get_Notification_basedon_UserId -- Upendra
+        public dynamic Get_Notification_basedon_UserId(string Param1, string Param2)
         {
             try
             {
-                var MSG = "";
-                List<Crud_Notifications> data = new List<Crud_Notifications>();
-                ds = db.GetDataWithOneParameter(SPS.Get_Notification_basedon_UserId.ToString(), param);
-                var checkdb = db.CheckDatainDS(ds, 0);
-                if (checkdb == true)
+                ds = db.GetDataWithTwoParameters(
+                    SPS.Get_Notification_basedon_UserId.ToString(),
+                    Param1,
+                    Param2
+                );
+
+                // Param1 = 1 → Get Notifications
+                if (Param1 == "1")
                 {
-                    data = ds.Tables[0].AsEnumerable().Select(A => new Crud_Notifications
+                    List<Crud_Notifications> data = new List<Crud_Notifications>();
+
+                    var checkdb = db.CheckDatainDS(ds, 0);
+
+                    if (checkdb == true)
                     {
-                        NotificationsID = A.Field<Int32?>("NotificationsID") + 0,
-                        NotificationsDesc = A.Field<string>("NotificationsDesc") + "",
-                        NotificationsImage = A.Field<string>("NotificationsImage") + "",
-                        RegID = A.Field<Int32?>("RegID") + 0,
-                        Status = A.Field<Boolean?>("Status") ?? null,
-                        CreatedBy = A.Field<Int32?>("CreatedBy") + 0,
-                        CreatedDate = A.Field<DateTime?>("CreatedDate") ?? null,
-                        ModifiedBy = A.Field<Int32?>("ModifiedBy") + 0,
-                        ModifiedDate = A.Field<DateTime?>("ModifiedDate") ?? null
-                    }).ToList();
+                        data = ds.Tables[0].AsEnumerable().Select(A => new Crud_Notifications
+                        {
+                            NotificationsID = A.Field<Int32?>("NotificationsID") ?? 0,
+                            NotificationsDesc = A.Field<string>("NotificationsDesc") ?? "",
+                            NotificationsImage = A.Field<string>("NotificationsImage") ?? "",
+                            RegID = A.Field<Int32?>("RegID") ?? 0,
+                            Status = A.Field<Boolean?>("Status"),
+                            CreatedBy = A.Field<Int32?>("CreatedBy") ?? 0,
+                            CreatedDate = A.Field<DateTime?>("CreatedDate"),
+                            ModifiedBy = A.Field<Int32?>("ModifiedBy") ?? 0,
+                            ModifiedDate = A.Field<DateTime?>("ModifiedDate")
+                        }).ToList();
+                    }
+
                     return data;
                 }
-                return MSG;
+
+                // Param1 = 2 → Delete Notification
+                if (Param1 == "2")
+                {
+                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    {
+                        return ds.Tables[0].Rows[0]["MSG"].ToString();
+                    }
+
+                    return "";
+                }
+
+                return "";
             }
             catch (Exception ex)
             {
                 exp.ExceptionHandler(ex);
-                saveExceptions((ex.Message + ex.StackTrace).ToString(), "1", "Weabapi");
+                saveExceptions(
+                    (ex.Message + ex.StackTrace).ToString(),
+                    "1",
+                    "Webapi"
+                );
                 return "";
             }
-
         }
-
-        #endregion 
+        #endregion
 
         #region Get_USERrequest_Closedrequest_Idbased -- manohar
         public dynamic Get_USERrequest_Closedrequest_Idbased(string Param1, string Param2)
@@ -5500,6 +5578,7 @@ namespace BloodGroupApi.Models
                         RegCity = A.Field<string>("RegCity") + "",
                         RegPin = A.Field<string>("RegPin") + "",
                         RegArea = A.Field<string>("RegArea") + "",
+                        DeviceToken = A.Field<string>("DeviceToken") + "",
                     }).ToList();
                 }
                 return userdata;
@@ -5658,6 +5737,7 @@ namespace BloodGroupApi.Models
                             Area = c.Field<string>("Area") + "",
                             Pincode = c.Field<string>("Pincode") + "",
                             CreatedDate = c.Field<DateTime?>("CreatedDate") ?? null,
+                            DeviceToken = c.Field<string>("DeviceToken") + "",
 
                         }).ToList();
                         return userdata;
