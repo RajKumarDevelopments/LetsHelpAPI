@@ -41,6 +41,7 @@ namespace BloodGroupApi.Models
             xml = ReplaceXmlTable.Replace("xsi:nil=\"true\"", "").Replace("xsi:type=\"xsd:boolean\"", "").Replace("xsi:type=\"xsd:string\"", "").Trim();
             return xml;
         }
+
         #endregion
 
     }

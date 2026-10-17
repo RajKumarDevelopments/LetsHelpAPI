@@ -1938,12 +1938,12 @@ namespace BloodGroupApi.Models
         #endregion
 
         #region Get Search user details-->Commented By SRINIVAS
-        public dynamic Get_Searchdetails(string Param1, string Param2)
+        public dynamic Get_Searchdetails(string Param1, string Param2, string Param3)
         {
             try
             {
                 List<search> allExceptions = new List<search>();
-                ds = db.GetDataWithTwoParameters(SPS.User_SearchDeatils.ToString(), Param1, Param2);
+                ds = db.GetDataWithThreeParameters(SPS.User_SearchDeatils.ToString(), Param1, Param2, Param3);
                 bool checkdata = db.CheckDatainDS(ds, 0);
                 if (checkdata == true)
                 {
@@ -1983,7 +1983,8 @@ namespace BloodGroupApi.Models
                         WhatsAppNext = c.Field<DateTime?>("WhatsAppNext") ?? null,
                         NotificationNext = c.Field<DateTime?>("NotificationNext") ?? null,
                         SMSNext = c.Field<DateTime?>("SMSNext") ?? null,
-                        Status = c.Field<Boolean?>("Status")?? null 
+                        Status = c.Field<Boolean?>("Status")?? null,
+                        IsAlreadyView = c.Field<Int32?>("IsAlreadyView")?? + 0
                     }).ToList();
                 }
                 return allExceptions;
@@ -5752,6 +5753,280 @@ namespace BloodGroupApi.Models
             }
         }
         #endregion
+
+        //   public dynamic DonorSearchLimit_CRUD(string Flag,string UserID,string DonorSearchLimitID,string ContactUsRequestID,string RequestTypeID, string Subject, string Description, string AdminRemarks,string ActionBy, string SearchedUserID)
+        //       {
+        //           try
+        //           {
+        //               var MSG = "";
+
+        //var ds = db.GetDataWithTenParam(SPS.DonorSearchLimit_CRUD.ToString(), Flag, UserID, DonorSearchLimitID, ContactUsRequestID, RequestTypeID,Subject, Description, AdminRemarks,  ActionBy, SearchedUserID);
+
+        //               if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //               {
+        //                   MSG = "Nodatafound";
+        //                   return MSG;
+        //               }
+        //               bool checkdb = db.CheckDatainDS(ds, 0);
+        //               if (checkdb)
+        //               {
+        //                   var data = ds.Tables[0].AsEnumerable()
+        //                       .Select(row => new DonorSearchLimitResponse
+        //                       {
+        //                           IsAllowed = row.Table.Columns.Contains("IsAllowed")? row.Field<bool?>("IsAllowed") : null,
+        //                           IsSuccess = row.Table.Columns.Contains("IsSuccess") ? row.Field<bool?>("IsSuccess") : null,
+        //                           Message = row.Table.Columns.Contains("Message") ? row.Field<string>("Message") ?? "" : "",
+        //                           SearchCount = row.Table.Columns.Contains("SearchCount") ? row.Field<int?>("SearchCount") ?? 0 : 0,
+        //                           ViolationCount = row.Table.Columns.Contains("ViolationCount") ? row.Field<int?>("ViolationCount") ?? 0 : 0,
+        //                           BlockEndDate = row.Table.Columns.Contains("BlockEndDate") ? row.Field<DateTime?>("BlockEndDate") : null,
+        //                           ContactUsRequestID = row.Table.Columns.Contains("ContactUsRequestID") ? row.Field<long?>("ContactUsRequestID") ?? 0: 0
+        //                       })
+        //                       .ToList();
+        //                   return data;
+        //               }
+
+        //               MSG = ds.Tables[0].Rows[0][0].ToString();
+        //               return MSG;
+        //           }
+        //           catch (Exception ex)
+        //           {
+        //               exp.ExceptionHandler(ex);
+        //               throw new ApplicationException(
+        //                   "An error occurred while processing donor search limit.",
+        //                   ex
+        //               );
+        //           }
+        //       }
+
+public dynamic DonorSearchLimit_CRUD(string Flag,string UserID,string DonorSearchLimitID,string ContactUsRequestID,string RequestTypeID,string Subject,string Description,string AdminRemarks,string ActionBy,string SearchedUserID)
+        {
+            try
+            {
+                var MSG = "";
+
+                var ds = db.GetDataWithTenParam(
+                    SPS.DonorSearchLimit_CRUD.ToString(),
+                    Flag,
+                    UserID,
+                    DonorSearchLimitID,
+                    ContactUsRequestID,
+                    RequestTypeID,
+                    Subject,
+                    Description,
+                    AdminRemarks,
+                    ActionBy,
+                    SearchedUserID
+                );
+
+                if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+                {
+                    return "Nodatafound";
+                }
+
+                bool checkdb = db.CheckDatainDS(ds, 0);
+
+                if (checkdb)
+                {
+                    // Flag 1: Check donor search eligibility
+                    if (Flag == "1")
+                    {
+                        var data = ds.Tables[0].AsEnumerable()
+                            .Select(A => new DonorSearchLimitResponse
+                            {
+                                IsAllowed = A.Field<bool?>("IsAllowed"),
+                                Message = A.Field<string>("Message") + "",
+                                DailyCount = A.Field<int?>("DailyCount") ?? 0,
+                                MonthlyCount = A.Field<int?>("MonthlyCount") ?? 0,
+                                ViolationCount = A.Field<int?>("ViolationCount") ?? 0,
+                                PermanentBlocked = A.Field<bool?>("PermanentBlocked"),
+                                TemporaryBlocked = A.Field<bool?>("TemporaryBlocked"),
+                                BlockEndDate = A.Field<DateTime?>("BlockEndDate")
+                            })
+                            .ToList();
+
+                        return data;
+                    }
+
+                    // Flag 2: Track donor search
+                    // These three columns are returned by every Flag 2 result.
+                    if (Flag == "2")
+                    {
+                        var data = ds.Tables[0].AsEnumerable()
+                            .Select(A => new DonorSearchLimitResponse
+                            {
+                                IsAllowed = A.Field<bool?>("IsAllowed"),
+                                Message = A.Field<string>("Message") + "",
+                                ViolationCount = A.Field<int?>("ViolationCount") ?? 0
+                            })
+                            .ToList();
+
+                        return data;
+                    }
+
+                    // Flag 3: Submit Contact Us request
+                    if (Flag == "3")
+                    {
+                        var data = ds.Tables[0].AsEnumerable()
+                            .Select(A => new DonorSearchLimitResponse
+                            {
+                                IsSuccess = A.Field<bool?>("IsSuccess"),
+                                Message = A.Field<string>("Message") + "",
+                                ContactUsRequestID =
+                                    A.Field<long?>("ContactUsRequestID") ?? 0
+                            })
+                            .ToList();
+
+                        return data;
+                    }
+
+                    // Flag 4: Fetch pending Contact Us requests
+                    if (Flag == "4")
+                    {
+                        var contactUsData = ds.Tables[0].AsEnumerable()
+                            .Select(A => new ContactUsRequestResponse
+                            {
+                                ContactUsRequestID =
+                                    A.Field<long?>("ContactUsRequestID") ?? 0,
+
+                                UserID = A.Field<long?>("UserID") ?? 0,
+
+                                RequestTypeName =
+                                    A.Field<string>("RequestTypeName") + "",
+
+                                Subject = A.Field<string>("Subject") + "",
+
+                                Description = A.Field<string>("Description") + "",
+
+                                StatusID = A.Field<int?>("StatusID") ?? 0,
+
+                                StatusName = A.Field<string>("StatusName") + "",
+
+                                AdminRemarks = A.Field<string>("AdminRemarks") + "",
+
+                                RequestedDate = A.Field<DateTime?>("RequestedDate"),
+
+                                ActionDate = A.Field<DateTime?>("ActionDate"),
+
+                                ActionBy = A.Field<long?>("ActionBy") ?? 0
+                            })
+                            .ToList();
+
+                        return contactUsData;
+                    }
+
+                    // Flag 5: Approve Contact Us request
+                    if (Flag == "5")
+                    {
+                        var data = ds.Tables[0].AsEnumerable()
+                            .Select(A => new DonorSearchLimitResponse
+                            {
+                                IsSuccess = A.Field<bool?>("IsSuccess"),
+                                Message = A.Field<string>("Message") + ""
+                            })
+                            .ToList();
+
+                        return data;
+                    }
+
+                    // Flag 6: Reject Contact Us request
+                    if (Flag == "6")
+                    {
+                        var data = ds.Tables[0].AsEnumerable()
+                            .Select(A => new DonorSearchLimitResponse
+                            {
+                                IsSuccess = A.Field<bool?>("IsSuccess"),
+                                Message = A.Field<string>("Message") + ""
+                            })
+                            .ToList();
+
+                        return data;
+                    }
+
+                    // Flag 7: Fetch donor search restriction details
+                    if (Flag == "7")
+                    {
+                        var data = ds.Tables[0].AsEnumerable()
+                            .Select(A => new
+                            {
+                                DonorSearchLimitID =
+                                    A.Field<long?>("DonorSearchLimitID") ?? 0,
+
+                                UserID = A.Field<long?>("UserID") ?? 0,
+
+                                ViolationCount =
+                                    A.Field<int?>("ViolationCount") ?? 0,
+
+                                TemporaryBlocked =
+                                    A.Field<bool?>("TemporaryBlocked") ?? false,
+
+                                TemporaryBlockedDate =
+                                    A.Field<DateTime?>("TemporaryBlockedDate"),
+
+                                TemporaryBlockEndDate =
+                                    A.Field<DateTime?>("TemporaryBlockEndDate"),
+
+                                PermanentBlocked =
+                                    A.Field<bool?>("PermanentBlocked") ?? false,
+
+                                PermanentBlockedDate =
+                                    A.Field<DateTime?>("PermanentBlockedDate"),
+
+                                UnblockedByAdmin =
+                                    A.Field<bool?>("UnblockedByAdmin") ?? false,
+
+                                UnblockedDate =
+                                    A.Field<DateTime?>("UnblockedDate"),
+
+                                UnblockedBy =
+                                    A.Field<long?>("UnblockedBy") ?? 0,
+
+                                Status = A["Status"],
+
+                                CreatedDate =
+                                    A.Field<DateTime?>("CreatedDate"),
+
+                                ModifiedDate =
+                                    A.Field<DateTime?>("ModifiedDate"),
+
+                                DailyCount =
+                                    A.Field<int?>("DailyCount") ?? 0,
+
+                                MonthlyCount =
+                                    A.Field<int?>("MonthlyCount") ?? 0
+                            })
+                            .ToList();
+
+                        return data;
+                    }
+
+                    // Existing fallback for an unhandled flag
+                    var response = ds.Tables[0].AsEnumerable()
+                        .Select(A => new DonorSearchLimitResponse
+                        {
+                            IsAllowed = A.Field<bool?>("IsAllowed"),
+                            IsSuccess = A.Field<bool?>("IsSuccess"),
+                            Message = A.Field<string>("Message") + ""
+                        })
+                        .ToList();
+
+                    return response;
+                }
+
+                MSG = ds.Tables[0].Rows[0][0].ToString();
+
+                return MSG;
+            }
+            catch (Exception ex)
+            {
+                exp.ExceptionHandler(ex);
+
+                throw new ApplicationException(
+                    "An error occurred while processing donor search limit.",
+                    ex
+                );
+            }
+        }
+
 
     }
 

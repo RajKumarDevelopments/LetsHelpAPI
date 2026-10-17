@@ -121,5 +121,6 @@ namespace BloodGroupApi.Models
         CastMaster_crud,// Upendra
         BloodReasonMaster_crud,//Upendra
         BloodAcceptedpersons,//Upendra
+        DonorSearchLimit_CRUD, // Upendra
     }
 }

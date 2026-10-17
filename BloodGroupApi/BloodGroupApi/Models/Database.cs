@@ -697,7 +697,7 @@ namespace BloodGroupApi.Models
                 Parm10.DbType = DbType.String;
                 Parm10.Value = Param10;
                 Parm10.ParameterName = "@Param10";
-                cmd.Parameters.Add(Parm9);
+                cmd.Parameters.Add(Parm10);
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(ds);
                 return ds;

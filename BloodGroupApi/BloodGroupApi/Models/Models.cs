@@ -684,16 +684,12 @@ namespace BloodGroupApi.Models
             public string Messagetorequester { get; set; }
             public string Age { get; set; }
             public string Devicetoken { get; set; }
-
-            
-
-
-            
             public DateTime? PhoneCallNext { get; set; }
             public DateTime? WhatsAppNext { get; set; }
             public DateTime? NotificationNext { get; set; }
             public DateTime? SMSNext { get; set; }
             public Boolean? Status { get; set; }
+            public Int32? IsAlreadyView { get; set; }
         }
 
         public class Request
@@ -1522,6 +1518,41 @@ namespace BloodGroupApi.Models
             public string BloodRequestID { get; set; }
             public string HospitalAddress { get; set; }
             public DateTime? BloodRequestDate { get; set; }
+        }
+
+        public class DonorSearchLimitResponse
+        {
+            public bool? IsAllowed { get; set; }
+
+            public bool? IsSuccess { get; set; }
+
+            public string Message { get; set; }
+
+            public Int32? SearchCount { get; set; }
+
+            public Int32? ViolationCount { get; set; }
+
+            public DateTime? BlockEndDate { get; set; }
+
+            public long? ContactUsRequestID { get; set; }
+            public Int32? DailyCount { get; set; }
+            public Int32? MonthlyCount { get; set; }
+            public Boolean? PermanentBlocked { get; set; }
+            public Boolean? TemporaryBlocked { get; set; }
+        }
+        public class ContactUsRequestResponse
+        {
+                public long? ContactUsRequestID { get; set; }
+                public long? UserID { get; set; }
+                public string RequestTypeName { get; set; }
+                public string Subject { get; set; }
+                public string Description { get; set; }
+                public int? StatusID { get; set; }
+                public string StatusName { get; set; }
+                public string AdminRemarks { get; set; }
+                public DateTime? RequestedDate { get; set; }
+                public DateTime? ActionDate { get; set; }
+                public long? ActionBy { get; set; }
         }
     }
 }

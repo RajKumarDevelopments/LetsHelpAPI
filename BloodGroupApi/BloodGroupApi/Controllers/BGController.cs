@@ -1273,7 +1273,7 @@ namespace BloodGroupApi.Controllers
 
 
 
-        #region   Get Searchdetails    -- sv
+        #region   Get Searchdetails    -- Upendra
         [HttpPost]
         public dynamic Get_Searchdetails()
         {
@@ -1281,8 +1281,9 @@ namespace BloodGroupApi.Controllers
             {
                 var Param1 = System.Web.HttpContext.Current.Request.Form["Param1"];
                 var Param2 = System.Web.HttpContext.Current.Request.Form["Param2"];
+                var Param3 = System.Web.HttpContext.Current.Request.Form["Param3"];
 
-                var MSG = BL.Get_Searchdetails(Param1, Param2);
+                var MSG = BL.Get_Searchdetails(Param1, Param2, Param3);
                 return MSG;
             }
             catch (System.Exception ex)
@@ -3494,6 +3495,33 @@ namespace BloodGroupApi.Controllers
                 throw ex;
             }
         }
+        #endregion
+
+        #region Donor Search Limit
+        [HttpPost]
+        public dynamic DonorSearchLimit_CRUD()
+        {
+            try
+            {
+                var Flag = System.Web.HttpContext.Current.Request.Form["Flag"];
+                var UserID = System.Web.HttpContext.Current.Request.Form["UserID"];
+                var DonorSearchLimitID = System.Web.HttpContext.Current.Request.Form["DonorSearchLimitID"];
+                var ContactUsRequestID = System.Web.HttpContext.Current.Request.Form["ContactUsRequestID"];
+                var RequestTypeID = System.Web.HttpContext.Current.Request.Form["RequestTypeID"];
+                var Subject = System.Web.HttpContext.Current.Request.Form["Subject"];
+                var Description = System.Web.HttpContext.Current.Request.Form["Description"];
+                var AdminRemarks = System.Web.HttpContext.Current.Request.Form["AdminRemarks"];
+                var ActionBy = System.Web.HttpContext.Current.Request.Form["ActionBy"];
+                var SearchedUserID = System.Web.HttpContext.Current.Request.Form["SearchedUserID"];
+  var data = BL.DonorSearchLimit_CRUD(Flag, UserID, DonorSearchLimitID, ContactUsRequestID, RequestTypeID, Subject, Description, AdminRemarks,ActionBy, SearchedUserID);
+                return data;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         #endregion
     }
 }
