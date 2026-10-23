@@ -5907,7 +5907,10 @@ public dynamic DonorSearchLimit_CRUD(string Flag,string UserID,string DonorSearc
 
                                 ActionDate = A.Field<DateTime?>("ActionDate"),
 
-                                ActionBy = A.Field<long?>("ActionBy") ?? 0
+                                ActionBy = A.Field<long?>("ActionBy") ?? 0,
+                                Devicetoken = A.Field<string>("Devicetoken") + "",
+                                Email = A.Field<string>("Email") + "",
+                                FullName = A.Field<string>("FullName") + ""
                             })
                             .ToList();
 

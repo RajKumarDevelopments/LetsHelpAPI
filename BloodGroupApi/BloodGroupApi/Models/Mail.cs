@@ -3243,6 +3243,158 @@ namespace BloodGroupApi.Models
         #endregion
 
 
+        #region SendDonorSearchApprovalMail
+
+        public dynamic SendDonorSearchApprovalMail( string Email, string AdminComments, string fullname)
+        {
+            try
+            {
+                StringBuilder sbDesign = new StringBuilder();
+
+                sbDesign.Append( "<div style='font-family:Poppins,Arial,sans-serif;" + "font-size:14px;color:#000;line-height:1.7;'>" );
+
+                sbDesign.Append("Dear" + " "+fullname+",");
+                sbDesign.Append("<br/><br/>");
+
+sbDesign.Append( "We are pleased to inform you that your donor search " + "restriction removal request has been <b>approved</b> " + "by the Let's Help administration team." );
+
+                sbDesign.Append("<br/><br/>");
+
+                sbDesign.Append( "Your request has been reviewed, and the approval " + "has been processed successfully." );
+
+                sbDesign.Append("<br/><br/>");
+
+                if (!string.IsNullOrWhiteSpace(AdminComments))
+                {
+                    sbDesign.Append(
+                        "<b>Admin Comments:</b><br/>"
+                    );
+
+                    sbDesign.Append(
+                        System.Web.HttpUtility.HtmlEncode(AdminComments)
+                            .Replace("\r\n", "<br/>")
+                            .Replace("\n", "<br/>")
+                    );
+
+                    sbDesign.Append("<br/><br/>");
+                }
+
+                sbDesign.Append(
+                    "Thank you for being part of our blood donation " +
+                    "community and supporting our mission to help people in need."
+                );
+
+                sbDesign.Append("<br/><br/>");
+
+                sbDesign.Append(
+                    "If you have any questions, please contact our support team."
+                );
+
+                sbDesign.Append("<br/><br/>");
+
+                sbDesign.Append(
+                    "Warm regards,<br/><b>Team Let's Help</b>"
+                );
+
+                sbDesign.Append("<br/><br/>");
+
+                sbDesign.Append(
+                    "<a href='https://letshelp.in/'>https://letshelp.in/</a>"
+                );
+
+                sbDesign.Append("</div>");
+
+                string Subject =
+                    "Your Donor Search Restriction Request Has Been Approved";
+
+                // Send approval email without attachment
+                SendMail1CC(
+                    Email,
+                    sbDesign.ToString(),
+                    Subject,
+                    null
+                );
+
+                return "SUCCESS";
+            }
+            catch (Exception ex)
+            {
+                exp.ExceptionHandler(ex);
+
+                saveExceptions(
+                    (ex.Message + ex.StackTrace).ToString(),
+                    "1",
+                    "Webapi"
+                );
+
+                throw;
+            }
+        }
+
+        #endregion
+
+        #region SendApprovalMail1CC
+
+        public string SendApprovalMail1CC(string Email, string sbDesign, string Subject)
+        {
+            try
+            {
+                List<SmtpDetails> listsmtpdetails = GetMailsmtpdetails();
+                var smtpDetails = listsmtpdetails[0];
+                MailMessage mail = new MailMessage();
+                // FROM
+                mail.From = new MailAddress( smtpDetails.fromaddress,"Let's Help", Encoding.UTF8);
+
+                // User email
+                if (!string.IsNullOrWhiteSpace(Email) && Email != "undefined")
+                {
+                    mail.To.Add(Email);
+                }
+                else
+                {
+                    throw new Exception("User email is missing");
+                }
+
+                // Admin email in CC
+                if (!string.IsNullOrWhiteSpace(smtpDetails.ToAddress))
+                {
+                    mail.CC.Add(smtpDetails.ToAddress);
+                }
+
+                // Email details
+                mail.Subject = Subject;
+                mail.IsBodyHtml = true;
+                mail.Body = sbDesign;
+                mail.BodyEncoding = Encoding.UTF8;
+                mail.Priority = MailPriority.High;
+
+                // SMTP configuration
+                using (SmtpClient smtp = new SmtpClient(smtpDetails.host))
+                {
+                    smtp.Port = smtpDetails.port;
+                    smtp.UseDefaultCredentials = false;
+                    smtp.Credentials = new NetworkCredential(
+                        smtpDetails.fromaddress,
+                        smtpDetails.frompassword
+                    );
+                    smtp.EnableSsl = true;
+
+                    smtp.Send(mail);
+                }
+
+                mail.Dispose();
+
+                return "SUCCESS";
+            }
+            catch (Exception ex)
+            {
+                exp.ExceptionHandler(ex);
+                throw;
+            }
+        }
+
+        #endregion
+
     }
 }
     

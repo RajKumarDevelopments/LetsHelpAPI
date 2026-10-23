@@ -1553,6 +1553,9 @@ namespace BloodGroupApi.Models
                 public DateTime? RequestedDate { get; set; }
                 public DateTime? ActionDate { get; set; }
                 public long? ActionBy { get; set; }
+                public string Devicetoken { get; set; }
+                public string Email { get; set; }
+                public string FullName { get; set; }
         }
     }
 }

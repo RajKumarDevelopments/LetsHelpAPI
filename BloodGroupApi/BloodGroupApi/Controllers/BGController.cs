@@ -1,27 +1,27 @@
+using BloodGroupApi.Filter;
 using BloodGroupApi.Models;
+using Google.Apis.Auth.OAuth2;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data; //temp
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Mail;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using System.Web.Script.Serialization;
 using System.Xml;
-using System.Data; //temp
-using System.Web;
-using System.Security.Cryptography;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using Google.Apis.Auth.OAuth2;
-
 using static BloodGroupApi.Models.Models;
-using BloodGroupApi.Filter;
-
-
 
 namespace BloodGroupApi.Controllers
 {
@@ -3523,6 +3523,50 @@ namespace BloodGroupApi.Controllers
         }
 
         #endregion
+
+
+
+
+        #region SendDonorSearchApprovalMail
+
+        [HttpPost]
+        public dynamic SendDonorSearchApprovalMail()
+        {
+            try
+            {
+                var contactUsRequestID = System.Web.HttpContext.Current.Request.Form["ContactUsRequestID"];
+
+                var email = System.Web.HttpContext.Current.Request.Form["Email"];
+
+                var adminComments = System.Web.HttpContext.Current.Request.Form["AdminComments"];
+                var fullname = System.Web.HttpContext.Current.Request.Form["FullName"];
+
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return new
+                    {
+                        Message = "Recipient email is missing."
+                    };
+                }
+
+                var result = mail.SendDonorSearchApprovalMail( email,adminComments, fullname);
+
+                return new
+                {
+                    Message = result
+                };
+            }
+            catch (Exception ex)
+            {
+                exp.ExceptionHandler(ex);
+                throw;
+            }
+        }
+
+        #endregion
+
+
+
     }
 }
    
