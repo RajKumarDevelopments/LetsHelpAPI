@@ -3715,6 +3715,7 @@ namespace BloodGroupApi.Models
                                 NotificationsImage = A.Field<string>("NotificationsImage") + "",
                                 RegID = A.Field<Int32?>("RegID") + 0,
                                 NotiRecevieID = A.Field<Int32?>("NotiRecevieID") + 0,
+                                RouterLink = A.Field<string>("RouterLink") + "",
                                 Status = A.Field<Boolean?>("Status") ?? null,
                                 AcceptStatus = A.Field<Boolean?>("AcceptStatus") ?? null,
                                 CreatedBy = A.Field<Int32?>("CreatedBy") + 0,
@@ -4051,7 +4052,8 @@ namespace BloodGroupApi.Models
             try
             {
                 // Set the Firebase project ID
-                string projectId = "bloodgroup-94ed5"; // Replace with your actual Firebase project ID
+               // string projectId = "bloodgroup-94ed5"; // Replace with your actual Firebase project ID
+                string projectId = "bloodgroup-94ed5-219a9";
 
                 // Create the FCM HTTP v1 API endpoint URL
                 string url = $"https://fcm.googleapis.com/v1/projects/{projectId}/messages:send";
@@ -4334,6 +4336,7 @@ namespace BloodGroupApi.Models
                             NotificationsID = A.Field<Int32?>("NotificationsID") ?? 0,
                             NotificationsDesc = A.Field<string>("NotificationsDesc") ?? "",
                             NotificationsImage = A.Field<string>("NotificationsImage") ?? "",
+                            RouterLink = A.Field<string>("RouterLink") ?? "",
                             RegID = A.Field<Int32?>("RegID") ?? 0,
                             Status = A.Field<Boolean?>("Status"),
                             CreatedBy = A.Field<Int32?>("CreatedBy") ?? 0,

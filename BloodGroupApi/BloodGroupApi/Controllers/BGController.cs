@@ -36,25 +36,37 @@ namespace BloodGroupApi.Controllers
         Mail mail = new Mail();
         //PwdEncryptDecrypt Encryption = new PwdEncryptDecrypt();
 
-
-
-
-
-        #region Service Account keys for getting accessToken to send the pushNotifications--Venu,suraj
+//        #region Service Account keys for getting accessToken to send the pushNotifications--Venu,suraj
+//        private const string JsonKeyString = @"
+//   {
+//  ""type"": ""service_account"",
+//  ""project_id"": ""bloodgroup-94ed5"",
+//  ""private_key_id"": ""c6401a1e84090f01cfb9d6bd4d8c07d15a587170"",
+//  ""private_key"": ""-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCIIycKOjMKy/oU\nKY9Gm7ugp79G4oM4mR4qxZ3HGw/TV3KdU6ksccV27WIHoufxYZqTwMdKnzgRhXLf\naHlNxZTJmR+6zgGFCbDt1gvfV1iMl8L5ANErh2uQ6gySAsrXi/NcjqHmISlzIjcN\nHzQv/CPNec0sKWTviLtCieo52jZ/oKlZu/7L5m2+SPmhmliiiXKYk6e6sGiD7Oms\n8q64jFPkpU0HvggJNag+VCYtr13uhkJaUkwPudNsL75wG9h9S+G0XDn9LLkvnh8Z\nqpRAjkz3FaLR1ySO9ic0KTq+SHTi4YtDhWT+zjs9rWbZPq4BXxd32EMu4tbkw2PV\n9x1HrdS5AgMBAAECggEAIITbGr2PuzzBuia6R4jEPypKzc0mQLMMqnVljK3JcDej\nlHKrRsdPfqrSH5ZZlsZ0lOY4BLp3O3I34CdV0I7JjYVy952lbcjEl29pixpTd9P5\nmh7ImEADIQzTX15k4yuWQI3+nNjfjJXH9i21ut+dEsRNTwb9Sh2Mc6a7iUG3gnE+\nSrrNDuU2I1l/Tn7R5uQxhyW+zMAZ1uqIcDPHLis79DpK5ZmUzyBtlvqEqQq0ClKT\n8zYJEDyDW7CYMQC6ZQqkQ0V9aCZGUcZwwAd1Qnp1fkIUdHvNpV+3O6cg7eu/6mlC\nVgeDTdqfnsgVPHDmX7MLWA0EQav+pZfTM9QtId3mHQKBgQC6wuicMNgEY/TA98Kw\nTEuhE4bzYRtbJMFEuEgshckgHMxWikbiC5qlrr5WtBlU2ggf/B1fMZTwTdVa1uHh\n+28wQCC5rnhK5Uoq58UkzkBoIRoEOdyK8BOJWEW8w1Up/ljJE6LYLWKTHzZbMl9e\nJ+O4ivZnXmBjIt2QZR/18MZyTQKBgQC6m6HHNI5kgNNUYKlJX1HhcRxroxHNfCRE\ne3SARxcsFlZUfgFjihfaNz7JUjoaN6llN8YOePe5HfQFplWlWg31mhfl6ecc6eDr\nU/wFqCJjNyaBaCeiPWM67BN+ngKQkMe4oM/oDHvy3H+SwCn0GJjd16mg3hUagZH0\nl/yyRttqHQKBgDYMLfD1ma47lxs5GFiY29IzqnxIf/gyfNP8WLa5yOjILMJmpfjI\nzupf1amV2TbbGjrXZVClMqsQe0wcn6Ycc6MNC+tweFOEY6BjDoSGQ9Fesv7CF/cF\nX0ICD7x+8uiCOQOH8TqKd9qHz904iKzg8l/3pzNm9pH6BxDAky1DjsqJAoGAEWuR\n8KzBVjSIhen4I7dYR3lts8anVM1v/UyhFZCNYzo6mOyiaI5tp5tcqyKX9faYQ7Cv\nNo6oYYmgTB65BBSiFPlrnbT2NEbJDm7qqgSGIUj2uUHl4UllyAxdzYYmqyQ44M1y\nWzE/KO7YofR6diUNsDf/x9qzkaPi4jiGCIaA2SkCgYA0SZMDGJwHa5DLbdCYtj8e\nRNx6KlPpEIy4yogmWR+2sWPyu1VCs0+I01ZU+lG75WOZ361QHqpw0hmV44fyk/bw\nGMNVDZxLwUKenNS/HXo+wUjvOA3KcfLznSFlsJcFllWf0UrbGr87EYfKF6Op+M60\n2hD9c4ay5/f2p2gpTx8CxA==\n-----END PRIVATE KEY-----\n"",
+//  ""client_email"": ""firebase-adminsdk-bzyo7@bloodgroup-94ed5.iam.gserviceaccount.com"",
+//  ""client_id"": ""113992212833094531171"",
+//  ""auth_uri"": ""https://accounts.google.com/o/oauth2/auth"",
+//  ""token_uri"": ""https://oauth2.googleapis.com/token"",
+//  ""auth_provider_x509_cert_url"": ""https://www.googleapis.com/oauth2/v1/certs"",
+//  ""client_x509_cert_url"": ""https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-bzyo7%40bloodgroup-94ed5.iam.gserviceaccount.com"",
+//  ""universe_domain"": ""googleapis.com""
+//}";
+        //#endregion
+        #region Service Account keys for getting accessToken to send the pushNotifications-- Upendra 2026 11 09 Dewali
         private const string JsonKeyString = @"
-   {
-  ""type"": ""service_account"",
-  ""project_id"": ""bloodgroup-94ed5"",
-  ""private_key_id"": ""c6401a1e84090f01cfb9d6bd4d8c07d15a587170"",
-  ""private_key"": ""-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCIIycKOjMKy/oU\nKY9Gm7ugp79G4oM4mR4qxZ3HGw/TV3KdU6ksccV27WIHoufxYZqTwMdKnzgRhXLf\naHlNxZTJmR+6zgGFCbDt1gvfV1iMl8L5ANErh2uQ6gySAsrXi/NcjqHmISlzIjcN\nHzQv/CPNec0sKWTviLtCieo52jZ/oKlZu/7L5m2+SPmhmliiiXKYk6e6sGiD7Oms\n8q64jFPkpU0HvggJNag+VCYtr13uhkJaUkwPudNsL75wG9h9S+G0XDn9LLkvnh8Z\nqpRAjkz3FaLR1ySO9ic0KTq+SHTi4YtDhWT+zjs9rWbZPq4BXxd32EMu4tbkw2PV\n9x1HrdS5AgMBAAECggEAIITbGr2PuzzBuia6R4jEPypKzc0mQLMMqnVljK3JcDej\nlHKrRsdPfqrSH5ZZlsZ0lOY4BLp3O3I34CdV0I7JjYVy952lbcjEl29pixpTd9P5\nmh7ImEADIQzTX15k4yuWQI3+nNjfjJXH9i21ut+dEsRNTwb9Sh2Mc6a7iUG3gnE+\nSrrNDuU2I1l/Tn7R5uQxhyW+zMAZ1uqIcDPHLis79DpK5ZmUzyBtlvqEqQq0ClKT\n8zYJEDyDW7CYMQC6ZQqkQ0V9aCZGUcZwwAd1Qnp1fkIUdHvNpV+3O6cg7eu/6mlC\nVgeDTdqfnsgVPHDmX7MLWA0EQav+pZfTM9QtId3mHQKBgQC6wuicMNgEY/TA98Kw\nTEuhE4bzYRtbJMFEuEgshckgHMxWikbiC5qlrr5WtBlU2ggf/B1fMZTwTdVa1uHh\n+28wQCC5rnhK5Uoq58UkzkBoIRoEOdyK8BOJWEW8w1Up/ljJE6LYLWKTHzZbMl9e\nJ+O4ivZnXmBjIt2QZR/18MZyTQKBgQC6m6HHNI5kgNNUYKlJX1HhcRxroxHNfCRE\ne3SARxcsFlZUfgFjihfaNz7JUjoaN6llN8YOePe5HfQFplWlWg31mhfl6ecc6eDr\nU/wFqCJjNyaBaCeiPWM67BN+ngKQkMe4oM/oDHvy3H+SwCn0GJjd16mg3hUagZH0\nl/yyRttqHQKBgDYMLfD1ma47lxs5GFiY29IzqnxIf/gyfNP8WLa5yOjILMJmpfjI\nzupf1amV2TbbGjrXZVClMqsQe0wcn6Ycc6MNC+tweFOEY6BjDoSGQ9Fesv7CF/cF\nX0ICD7x+8uiCOQOH8TqKd9qHz904iKzg8l/3pzNm9pH6BxDAky1DjsqJAoGAEWuR\n8KzBVjSIhen4I7dYR3lts8anVM1v/UyhFZCNYzo6mOyiaI5tp5tcqyKX9faYQ7Cv\nNo6oYYmgTB65BBSiFPlrnbT2NEbJDm7qqgSGIUj2uUHl4UllyAxdzYYmqyQ44M1y\nWzE/KO7YofR6diUNsDf/x9qzkaPi4jiGCIaA2SkCgYA0SZMDGJwHa5DLbdCYtj8e\nRNx6KlPpEIy4yogmWR+2sWPyu1VCs0+I01ZU+lG75WOZ361QHqpw0hmV44fyk/bw\nGMNVDZxLwUKenNS/HXo+wUjvOA3KcfLznSFlsJcFllWf0UrbGr87EYfKF6Op+M60\n2hD9c4ay5/f2p2gpTx8CxA==\n-----END PRIVATE KEY-----\n"",
-  ""client_email"": ""firebase-adminsdk-bzyo7@bloodgroup-94ed5.iam.gserviceaccount.com"",
-  ""client_id"": ""113992212833094531171"",
-  ""auth_uri"": ""https://accounts.google.com/o/oauth2/auth"",
-  ""token_uri"": ""https://oauth2.googleapis.com/token"",
-  ""auth_provider_x509_cert_url"": ""https://www.googleapis.com/oauth2/v1/certs"",
-  ""client_x509_cert_url"": ""https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-bzyo7%40bloodgroup-94ed5.iam.gserviceaccount.com"",
-  ""universe_domain"": ""googleapis.com""
-}";
+        {
+          ""type"": ""service_account"",
+          ""project_id"": ""bloodgroup-94ed5-219a9"",
+          ""private_key_id"": ""a3fa0edd3acadf2d86143e118d2ece2d6251e18b"",
+          ""private_key"": ""-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCjBbFL5Us9SP8N\nm55VgGbROgyNCD1Ij7jgN93s6yQu87etA9WN0rW1BCoicbJiI307JaS5eOTZKAaV\nS5ZZ3oYcROlSOTe/6eoF6GonZuJ+kb+jO5WrrSl7EyonhYSrFPHIuw6LsKVtNR4O\nxHsYA7ysX1ReZMYgjtimpkDzWpbmAEfQN99PNptB32OLED0z2z6PY/X5WxXAW6SY\ntOEYoHK82jnnCi9qso+54u+3y/+SRZ/0/iyZJRUZpA+LafKBIOBoU50nYY76ujNq\nppfUsuY95rkaZL/wIYSeq3WozL5A5EAQzHD9+b3qsOHyhGAm/r5kF0MmoYI7CKez\nPQMRYc0/AgMBAAECggEAQ1cFIzwupbyi+ryHHXuCPTgU2icGpZQUwq3hIs4I7som\n27WjP8fD3me/feXoUUimoMmObzzkj11Mxtvn2eylCkVe+eN/x2s5C8KzIt6Jfc33\n0tY4n6dSZLAIcDXjlQX8UDYQrpxD4UYZSfFYhZV5mNxyDeHjw6wuCzzOxJdtkMjx\nGotUMo8we3e/W0uX7gYAFdPv3Eg/w+jqM6sNhJWSKeWCZfvE4sOWjovsEo4mZ2cy\nTq8UyLCatF5BZ/Q3j1uzxHQJ2Fpno9URpIsh0GiO5CMp5vyl4QCZnrmVdRcjbLW1\nlD54j+wMM3SuWC6B1fb+puEbmWGi4nncaGxSvKwB0QKBgQDNPYYqPM9OR4ylA9TC\n0BhiTaqIOT4PfJi9AD5Qodzdd9pMt3wVP7E7cBgTKC/UtarXrGFTgFeCLG2He3Xg\nIj6VWwIPQk3zeeU99ONu8LPrGx6KGZMCnw+LZZXnzYZXefHvnwOy1eHfOY0Smt+T\nNwFWJm5MlgmYbJ75U5TDo+AQjwKBgQDLVzHkTGQ3rjElrb6BHx9M/372Zg3PASYD\nByTE4mfi6XR72bQGFkDXI/UY/hjSldr2EqaLwTzJkicRT6QwOBwt+NVBijKl9IF7\nevcr5vAskoEqVcQZkUs3iHqBLuqTF2j9ZMuWFzeZjRkIDwPVNkzTdFWuNElw9h46\ntFxwTuJwUQKBgQCSZ9by/lnrP0Lm26rEJWmfhkOl1R+eMIVMHYZWQoCpQzvoCeNr\nzPmCqt2hnMMx+z2ZiBANXroN0992C+30Krl2FWuMswGkM0oCPlSW6QGPLtNENCYY\ncprGF3st1gCFGiopgsdCpSvw7r7hjLT78Pr1F4kK/ORvZNyqgqLWRGorpQKBgFl3\nROFg5xtEjiU427/uFJSJObBp2JuCstnUM85Ym0LQWsr/T2D6O48tJ/LWIc/N1Wg9\nbn/BBuDdaEkKlIAOv/9OI25RwtUXzjypLsVnN7c0wpYA5GYnckO9zcC3BsivHSeY\nSKcCEhmCZkgQayxNVuIWpngeU03bTBOiNaXIX4LxAoGAFuvOeCoelEKQZcKm2lqi\nA1hY6Ar6rQ8P9ayYougpyGQpjm5rc27qccYRztTgfR0jMeqAgiX5iXjfm/ieNqDb\nYtZxSjr/1+PcCh0w2pouaFmI3cPGA3PqWm+uuEdpqoDbAWx0/5NXzT6Wf52qtJQ2\nLYS+2paxMtpNk7Hnb4WxD/Q=\n-----END PRIVATE KEY-----\n"",
+          ""client_email"": ""firebase-adminsdk-fbsvc@bloodgroup-94ed5-219a9.iam.gserviceaccount.com"",
+          ""client_id"": ""114560676580544449096"",
+          ""auth_uri"": ""https://accounts.google.com/o/oauth2/auth"",
+          ""token_uri"": ""https://oauth2.googleapis.com/token"",
+          ""auth_provider_x509_cert_url"": ""https://www.googleapis.com/oauth2/v1/certs"",
+          ""client_x509_cert_url"": ""https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40bloodgroup-94ed5-219a9.iam.gserviceaccount.com"",
+          ""universe_domain"": ""googleapis.com""
+        }";
         #endregion
 
         #region Bearer Token -- Rambabu, Naushad 

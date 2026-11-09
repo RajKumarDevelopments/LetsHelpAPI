@@ -1127,6 +1127,7 @@ namespace BloodGroupApi.Models
             public Int32? RegID { get; set; }
             public Int32? RPId { get; set; }
             public Int32? NotiRecevieID { get; set; }
+            public string RouterLink { get; set; }
             public Boolean? Status { get; set; }
             public Boolean? AcceptStatus { get; set; }
             public DateTime? CreatedDate { get; set; }
